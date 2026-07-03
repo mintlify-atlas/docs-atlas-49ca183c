@@ -1,0 +1,113 @@
+---
+title: "Music Commands: Play, Queue, and Playback Controls"
+sidebarTitle: "Music"
+description: "Reference for Absolet's music slash commands: play, skip, stop, pause, resume, join, leave, nowplaying, and volume."
+---
+
+Absolet's music system is powered by [DisTube](https://distube.js.org/). All playback commands require the invoking user to be in a voice channel. Commands that act on the current queue (skip, stop, pause, resume, nowplaying, volume) will return an error if there is no active song queue. All music commands are available to **@everyone**.
+
+<Warning>
+  You must be in a voice channel to use any music command. The bot will not join or operate in a channel you are not currently in (except `/join`, which joins your current voice channel).
+</Warning>
+
+---
+
+## `/play`
+
+Adds a song to the queue and begins playback. Accepts a song name or URL (YouTube, SoundCloud, Spotify, etc. — depending on your DisTube plugins).
+
+**Default permission:** @everyone
+
+<ParamField path="song" type="String" required>
+  The song title to search for, or a direct URL.
+</ParamField>
+
+The bot defers the reply while searching and starts playback in your current voice channel.
+
+---
+
+## `/skip`
+
+Skips the currently playing song and advances to the next track in the queue.
+
+**Default permission:** @everyone
+
+No parameters. Returns an error if the queue is empty.
+
+---
+
+## `/stop`
+
+Stops playback and clears the entire song queue.
+
+**Default permission:** @everyone
+
+No parameters. Returns an error if the queue is empty.
+
+---
+
+## `/pause`
+
+Pauses the currently playing song without clearing the queue.
+
+**Default permission:** @everyone
+
+No parameters. Use `/resume` to continue playback.
+
+---
+
+## `/resume`
+
+Resumes a paused song.
+
+**Default permission:** @everyone
+
+No parameters. Returns an error if the queue is empty.
+
+---
+
+## `/join`
+
+Makes the bot join your current voice channel without starting playback.
+
+**Default permission:** @everyone
+
+No parameters. Useful for pre-staging the bot before queuing songs.
+
+---
+
+## `/leave`
+
+Disconnects the bot from its current voice channel. If a queue is active, it is stopped and cleared first.
+
+**Default permission:** @everyone
+
+No parameters.
+
+---
+
+## `/nowplaying`
+
+Displays information about the currently playing song, including name, uploader, duration progress bar, volume, and queue length.
+
+**Default permission:** @everyone
+
+No parameters. Returns an error if no song is currently playing.
+
+The progress bar uses a 30-character line with a 🔘 marker at the current position, and a 🟢/🔴 indicator showing whether playback is active or paused.
+
+---
+
+## `/volume`
+
+Sets the playback volume for the current queue.
+
+**Default permission:** @everyone
+
+<ParamField path="volume" type="Integer" required>
+  The volume level to set. Valid values depend on DisTube's internal range (typically 0–100+).
+</ParamField>
+
+<Note>
+  Volume changes apply immediately to the current queue and persist until the queue ends or volume is changed again.
+</Note>

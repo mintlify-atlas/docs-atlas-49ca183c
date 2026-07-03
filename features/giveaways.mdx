@@ -1,0 +1,106 @@
+---
+title: "Giveaway System with Role Requirements"
+sidebarTitle: "Giveaways"
+description: "Run timed giveaways in Absolet with optional role requirements. Users enter by reacting with 🎉; winners are selected automatically when the timer expires."
+---
+
+Absolet includes a fully-featured giveaway system powered by `discord-giveaways`. Staff members can launch timed giveaways with custom prizes, winner counts, and optional entry requirements based on levels, invites, or message count. When the timer expires the bot selects winners automatically, announces them in the channel, and sends each winner a direct message.
+
+## How Giveaways Work
+
+1. A staff member runs `/giveaway` and selects **Create** to open the setup wizard.
+2. The bot posts a giveaway embed in the specified channel showing the prize, number of winners, host, and a countdown timestamp.
+3. Server members react with 🎉 to enter. The reaction is the entry mechanism — no slash commands are required from participants.
+4. When the end time is reached, the bot picks the configured number of winners at random, updates the embed to show the results, and replies in the channel with a winner announcement.
+5. Each winner receives a DM congratulating them and instructing them to open a support ticket to claim their prize.
+
+<Note>
+  Bots are excluded from winning by default (`botsCanWin: false`).
+</Note>
+
+## Creating a Giveaway
+
+Run `/giveaway` and click the **🎉 Create** button to open the creation wizard. The wizard walks you through each required and optional field using button prompts:
+
+| Field | Required | Description |
+|---|---|---|
+| **Channel** 🛒 | ✅ | The text channel where the giveaway embed is posted. Mention the channel when prompted. |
+| **Time** ⏳ | ✅ | How long the giveaway runs. Accepts human-readable durations like `30m`, `2h`, `1d`. |
+| **Winners** 👑 | ✅ | How many winners will be selected. Must be a positive integer. |
+| **Prize** 🎁 | ✅ | The prize being given away (plain text). |
+| **Description** 📰 | ✅ | A short description shown in the giveaway embed body. |
+| **Image** 🖼 | ❌ | Upload an image attachment to display in the embed. |
+| **Requirements** 🍱 | ❌ | Entry requirements (see below). |
+
+Once all required fields are filled, a green **✔️ Save** button appears. Clicking it starts the giveaway immediately.
+
+<Tip>
+  Button labels turn **blue (Primary)** once their value has been set, making it easy to track your progress through the wizard.
+</Tip>
+
+## Entry Requirements
+
+Open the **Requirements** panel from within the creation wizard to gate entry behind server activity thresholds:
+
+| Requirement | Button | Description |
+|---|---|---|
+| **Level** ✨ | `rq-levels` | Minimum XP level the user must have reached |
+| **Invites** 👥 | `rq-invites` | Minimum number of successful invites |
+| **Messages** 🌟 | `rq-messages` | Minimum total messages sent in the server |
+
+Enter `0` for any requirement to remove it. When requirements are set, the giveaway embed switches to the `GiveawayWithRequirements` template which lists each threshold so participants can see what they need. Users who react but do not meet the requirements are excluded from the winner draw automatically.
+
+## Managing Active Giveaways
+
+All management actions are accessible from the same `/giveaway` command panel:
+
+<CardGroup cols={2}>
+  <Card title="⏸️ Pause" icon="pause">
+    Freezes an active giveaway's countdown. The giveaway remains posted but the end time is set to `Infinity` until resumed.
+  </Card>
+  <Card title="▶️ Resume" icon="play">
+    Resumes a previously paused giveaway, restoring its countdown timer.
+  </Card>
+  <Card title="🔁 Reroll" icon="rotate">
+    Re-selects winners from the original entry pool for an already-ended giveaway. Useful if an original winner is unable to claim their prize.
+  </Card>
+  <Card title="⏹️ End" icon="stop">
+    Immediately ends an active giveaway and triggers winner selection, regardless of remaining time.
+  </Card>
+</CardGroup>
+
+Selecting any of these actions opens a **select menu** listing all eligible giveaways by prize name. Pick one to apply the action.
+
+## Winner Notifications
+
+When a giveaway ends, Absolet sends each winner a DM. The message content is taken from the `GiveawayWinMessage` string in `messages.yml`. By default this message instructs winners to **open a support ticket** to claim their prize, keeping the prize handoff process organised and auditable.
+
+If no valid participants entered (or all participants failed requirement checks), the bot posts the `GiveawayContentNoWinners` string in the channel instead.
+
+## Configuration Reference
+
+Giveaway data is persisted in MongoDB via the `giveaways` collection. Key fields stored per giveaway include:
+
+```typescript
+{
+  messageId: string;       // Discord message ID of the giveaway embed
+  channelId: string;       // Channel the giveaway is posted in
+  guildId: string;
+  startAt: number;         // Unix timestamp (ms)
+  endAt: number;           // Unix timestamp (ms); Infinity when paused
+  ended: boolean;
+  winnerCount: number;
+  prize: string;
+  hostedBy: string;        // Discord user ID of the host
+  botsCanWin: false;       // Always false — bots cannot enter
+  extraData: {
+    description: string;
+    image: string;
+    requirements: {
+      levels: string;
+      messages: string;
+      invites: string;
+    };
+  };
+}
+```

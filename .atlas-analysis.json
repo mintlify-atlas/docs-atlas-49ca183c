@@ -1,0 +1,104 @@
+{
+  "projectType": "saas",
+  "projectName": "Absolet",
+  "projectDescription": "A feature-rich, self-hosted Discord bot providing tickets, music playback, moderation, economy, levels, giveaways, verification, reaction roles, server backups, and an addon system.",
+  "theme": "maple",
+  "primaryColor": "#E74C3C",
+  "lightColor": null,
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "configuration"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/tickets",
+              "features/moderation",
+              "features/economy",
+              "features/levels",
+              "features/music",
+              "features/giveaways",
+              "features/verification",
+              "features/reaction-roles"
+            ]
+          },
+          {
+            "group": "Admin Tools",
+            "pages": [
+              "admin/setup",
+              "admin/backups",
+              "admin/filters",
+              "admin/addons"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Command Reference",
+        "groups": [
+          {
+            "group": "Commands",
+            "pages": [
+              "commands/admin",
+              "commands/moderation",
+              "commands/tickets",
+              "commands/economy",
+              "commands/music",
+              "commands/fun",
+              "commands/general"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Ticket system with panels, questions, transcripts, and review ratings",
+    "Music playback via DisTube with YouTube and Spotify support",
+    "Full economy system with shop, daily/weekly rewards, blackjack, rob, and leaderboards",
+    "XP-based leveling system with configurable min/max XP per message",
+    "Giveaway system with role requirements and reaction-based entry",
+    "CAPTCHA and direct-verification system",
+    "Reaction roles with button and select-menu support",
+    "Server backups (create, load, list, delete)",
+    "Moderation commands: ban, kick, warn, clear, nuke, announce",
+    "Anti-links, anti-invites, and anti-ghost-ping filters",
+    "Starboard system for highlighting popular messages",
+    "Sticky roles that persist across rejoins",
+    "Custom slash commands via the custom-commands admin tool",
+    "Addon system for extending bot functionality",
+    "FAQ system with keyword-triggered responses",
+    "Interactive games: Blackjack, Tic-Tac-Toe, Connect 4, Wordle, Slots, RPS, GTN"
+  ],
+  "publicApiSurface": [
+    "/setup — configure all bot settings via interactive dashboard",
+    "/backup create|list|load|delete — manage server backups",
+    "/ticket-manage — create and manage ticket panels",
+    "/giveaway start|end|reroll — run giveaways",
+    "/verify — deploy verification panel",
+    "/reaction-roles — configure reaction role menus",
+    "/suggestion — manage suggestion channel",
+    "/custom-commands — create custom slash commands",
+    "/play, /skip, /stop, /pause, /resume, /volume, /nowplaying — music controls",
+    "/ban, /kick, /warn, /clear, /nuke, /announce — moderation actions",
+    "/balance, /work, /daily, /weekly, /pay, /rob, /shop — economy commands",
+    "/rank, /leaderboard, /invites, /messages — stats commands",
+    "/blackjack, /slots, /connect4, /tic-tac-toe, /wordle, /rps — games",
+    "/role-prefixes — manage display prefixes for roles",
+    "/shop-manage — add/remove economy shop items",
+    "/give-level, /give-xp, /set-level, /set-xp, /give-money, /set-money, /take-money — admin economy/level tools",
+    "/blacklist — temporarily blacklist users from using commands",
+    "/faq — manage FAQ keyword triggers",
+    "/poll — create interactive polls"
+  ]
+}

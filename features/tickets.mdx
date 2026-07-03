@@ -1,0 +1,154 @@
+---
+title: "Ticket System: Panels, Transcripts, and Reviews"
+sidebarTitle: "Tickets"
+description: "Absolet's ticket system supports multiple panels, custom questions, HTML transcripts, ticket reviews, and per-panel staff roles — all configured with /ticket-manage."
+---
+
+Absolet's ticket system turns any channel into a fully managed support hub. Administrators create one or more named panels — each with its own emoji, category, staff roles, and optional intake questions — and users open tickets by clicking a button or choosing from a select menu. Staff then work the ticket inside a private channel, claim ownership, and close it when done, at which point the bot can automatically generate an HTML transcript and prompt the user for a star rating.
+
+## How It Works
+
+The lifecycle of every ticket follows four stages:
+
+1. **Panel** — An admin creates one or more panels with `/ticket-manage setup` and posts the embed in a channel with `/ticket-manage send`.
+2. **Open** — A user clicks the panel button (or picks from the menu). If questions are configured, a Discord modal collects their answers before the channel is created.
+3. **Staff manage** — Staff use in-ticket slash commands to claim, add guests, alert the opener, or rename the channel.
+4. **Close** — Any authorised user runs `/close`. The bot revokes view access for regular users, posts action buttons (Transcript / Re-open / Delete), and — if auto-save is on — immediately saves the transcript to the configured channel.
+
+## Setup
+
+<Steps>
+  <Step title="Create a panel with /ticket-manage setup">
+    Run `/ticket-manage setup` (optionally pass `is-subcategory: True` to nest it under an existing panel). The interactive builder prompts you for:
+
+    | Property | What it sets |
+    |----------|-------------|
+    | **Name** | Display name shown on the button or menu option |
+    | **Emoji** | Unicode or custom server emoji shown on the button |
+    | **Category** | Discord category channel where ticket channels are created |
+    | **Style** | Button colour — Primary (blue), Secondary (grey), Success (green), or Danger (red) |
+    | **Roles** | One or more staff roles that can see and manage the ticket |
+    | **Label** | Toggle whether the panel name appears as text on the button |
+    | **Questions** | Optional intake questions (see [Adding Questions](#adding-questions)) |
+
+    Click **Save Panel** once all required fields are filled.
+  </Step>
+
+  <Step title="Configure ticket-wide settings via /setup → Ticket Settings">
+    Run `/setup` and select **Ticket Settings** to adjust:
+
+    | Setting | Default | Description |
+    |---------|---------|-------------|
+    | Max tickets per user | `1` | How many open tickets one user may have simultaneously |
+    | Transcript Channel | — | Channel where transcript files are posted |
+    | Transcript On Close | `false` | Auto-save transcript when a ticket is deleted |
+    | Send transcript to user | `false` | DM the transcript to the ticket owner instead of posting in the channel |
+    | Message Type | `buttons` | Display panels as **Buttons** or a **Select Menu** |
+    | Toggle Review System | `true` | Enable or disable the star-rating prompt after close |
+  </Step>
+
+  <Step title="Post the panel in a channel">
+    Run `/ticket-manage send [channel]`. Absolet sends an embed listing all top-level panels. When **Message Type** is `buttons`, each panel becomes a button row (up to 5 per row). When it is `menu`, all panels appear in a single select menu under the custom ID `tkt-menu`.
+
+    To update the panel list later, simply run `/ticket-manage send` again.
+  </Step>
+</Steps>
+
+## Ticket Panel Options
+
+Each panel stores the following fields in the `TicketPanel` schema:
+
+```typescript
+interface TicketPanel {
+  name: string;          // Displayed on button / menu option
+  emoji: string;         // Unicode emoji or <:name:id> custom emoji
+  customId: string;      // Auto-generated MongoDB ObjectId — used as button customId prefix "tkt-{customId}"
+  categoryParent: string | null; // customId of parent panel (sub-categories only)
+  category: string;      // Discord category channel ID for new ticket channels
+  style: ButtonStyle;    // 1 Primary | 2 Secondary | 3 Success | 4 Danger
+  roles: string[];       // Role IDs with access to this ticket type
+  label: boolean;        // true = show panel name as button label
+  questions: TicketPanelQuestion[];
+}
+```
+
+Use `/ticket-manage edit` to change any field after creation, or `/ticket-manage delete` to remove a panel entirely. `/ticket-manage list` paginates through all panels showing their IDs, roles, category, and style.
+
+## Adding Questions to a Panel
+
+During setup (or later via `/ticket-manage edit → Questions`), you can attach up to **25** intake questions. When a user opens the ticket, the bot presents a Discord modal with the configured fields.
+
+Each question has the following shape:
+
+```typescript
+interface TicketPanelQuestion {
+  name: string;        // Modal field label (max 44 chars)
+  type: number;        // TextInputStyle — 1 = Short | 2 = Paragraph
+  required: boolean;   // Whether the user must fill in this field
+  description: string; // Placeholder / hint text shown inside the input (max 100 chars)
+  regex: RegExp | null; // Optional pattern to validate the answer
+}
+```
+
+In the question builder, enter the type as `Short` or `Paragraph` and required as `Yes` or `No`. The regex field accepts any valid JavaScript regular expression; invalid patterns are silently ignored.
+
+## Staff Commands
+
+These commands only work inside an active ticket channel:
+
+<CardGroup cols={2}>
+  <Card title="/claim" icon="hand">
+    Assigns the ticket to the executing staff member. Sets `isClaimed = true` and `staffClaimed` to the staff ID. Other staff roles lose view access until the ticket is unclaimed or deleted.
+  </Card>
+  <Card title="/close" icon="lock">
+    Closes the ticket. Removes view access for all users in `usersInTicket`. Posts action buttons — **Transcript**, **Re-open**, and **Delete** — in the channel.
+  </Card>
+  <Card title="/open" icon="lock-open">
+    Re-opens a previously closed ticket. Restores view access for all users and removes the action-button message.
+  </Card>
+  <Card title="/add [user]" icon="user-plus">
+    Grants a Discord user `ViewChannel`, `SendMessages`, and `AttachFiles` in the ticket and adds them to `usersInTicket`.
+  </Card>
+  <Card title="/remove [user]" icon="user-minus">
+    Revokes a previously added user's permission overwrite and removes them from `usersInTicket`.
+  </Card>
+  <Card title="/alert" icon="bell">
+    Sends a DM to the ticket owner with a link back to the ticket channel. Useful when a ticket has gone quiet.
+  </Card>
+  <Card title="/rename [name]" icon="pen">
+    Renames the ticket's Discord channel and updates `channelName` in the database.
+  </Card>
+</CardGroup>
+
+## Message Types: Buttons vs. Menu
+
+The **Message Type** setting (configured in `/setup → Ticket Settings`) controls how the panel embed presents its options.
+
+| Mode | Behaviour |
+|------|-----------|
+| `buttons` | Each panel becomes a `ButtonBuilder` with custom ID `tkt-{customId}`. Buttons are grouped up to 5 per `ActionRow`. |
+| `menu` | All panels are combined into a single `StringSelectMenuBuilder` with custom ID `tkt-menu`. Users pick from a dropdown. |
+
+Sub-category panels (those with a `categoryParent`) are never included in the top-level button or menu rows — they appear only after a user selects the parent panel.
+
+## Transcript System
+
+When a ticket is closed and then deleted, Absolet can save a full HTML transcript of all messages.
+
+| Setting | How to configure |
+|---------|-----------------|
+| **Transcript Channel** | `/setup → Ticket Settings → Transcript Channel` |
+| **Auto-save on close** | `/setup → Ticket Settings → Transcript On Close` (toggle) |
+| **Send to user** | `/setup → Ticket Settings → Send transcript to user` — sends the file to the ticket owner's DMs instead of the server channel |
+
+Staff can also trigger a transcript manually at any time by clicking the **Transcript** button that appears after `/close` is used.
+
+## Review System
+
+When the review system is enabled (`reviewSystemEnabled: true`), Absolet sends a star-rating prompt to the ticket owner after the ticket channel is deleted. Ratings are stored in the guild's `ticketReviews` array alongside the `userId` and `staffId` of the claimed staff member.
+
+Toggle the review system at any time via `/setup → Ticket Settings → Toggle Review System`.
+
+<Note>
+  By default, each user may only have **1 open ticket at a time**. Increase this limit in `/setup → Ticket Settings → Max tickets per user`. If a user tries to open a second ticket beyond their limit, the bot will inform them of their existing ticket.
+</Note>

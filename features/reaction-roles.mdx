@@ -1,0 +1,139 @@
+---
+title: "Reaction Roles: Button and Select Menu Panels"
+sidebarTitle: "Reaction Roles"
+description: "Absolet's reaction role system lets you create button or select-menu panels that assign Discord roles when members click. Configure panels with /reaction-roles."
+---
+
+Reaction roles let your server members self-assign Discord roles by clicking a button on a panel embed. Each button is tied to a specific role, labelled with a custom emoji and text, and styled with one of Discord's four button colours. Panels are organised by category so you can have separate panels for notification preferences, regional roles, game interests, and more — all managed through a single `/reaction-roles` command.
+
+## Display Modes
+
+Absolet currently renders reaction role panels as **button rows**. Each role in a category becomes one button, and up to five buttons can be placed per row (Discord's limit). When a category has more than five roles the bot automatically wraps to a new action row.
+
+An optional `display-label` flag on the send subcommand controls whether the button shows the role's text label alongside its emoji, or just the emoji alone — useful for compact panels.
+
+## Setup
+
+<Steps>
+  <Step title="Add role entries">
+    Run `/reaction-roles add` once for each role you want to include. Provide all required fields:
+
+    ```
+    /reaction-roles add
+      category:<category-name>
+      role:@RoleName
+      emoji:🎮
+      label:Gaming
+      style:Primary
+    ```
+
+    | Field | Description |
+    |---|---|
+    | `category` | Groups this entry with others in the same panel (e.g. `notifications`, `countries`) |
+    | `role` | The Discord role to assign or remove when clicked |
+    | `emoji` | The emoji displayed on the button |
+    | `label` | The text label displayed on the button (shown only when `display-label` is `true` at send time) |
+    | `style` | Button colour: `Primary` (blue), `Secondary` (grey), `Success` (green), or `Danger` (red) |
+
+    Each entry is saved to the guild's `rolesConfig` array in MongoDB.
+  </Step>
+  <Step title="Review your entries (optional)">
+    Run `/reaction-roles list` at any time to see a paginated embed showing every configured role entry for the server, including its category, label, style, and emoji.
+
+    ```
+    /reaction-roles list
+    ```
+  </Step>
+  <Step title="Send the panel">
+    Run `/reaction-roles send` to post the panel for a specific category in a channel:
+
+    ```
+    /reaction-roles send
+      category:<category-name>
+      title:Choose Your Roles
+      description:Click a button to add or remove a role.
+      channel:#roles
+      display-label:true
+    ```
+
+    The bot filters `rolesConfig` to only include entries matching the given `category`, builds the button rows, and posts the embed. The embed body is built from the `SelectReactionRoleEmbed` template in `messages.yml` with the `{panels}` placeholder replaced by a formatted list of all roles in the category.
+  </Step>
+  <Step title="Members interact with the panel">
+    Once posted, any server member can click a button. The interaction is handled instantly — no slash command required from the member's side.
+  </Step>
+</Steps>
+
+## How It Works
+
+Each reaction role button carries a custom ID in the format `rct-<roleId>`. When a member clicks a button, Absolet's `reactionRoles` event handler:
+
+1. Extracts the role ID from the custom ID.
+2. Looks up the role in the guild's `rolesConfig`.
+3. Checks whether the member already has the role:
+   - **Has the role** → removes it and replies with `ReactionRoleRemovedEmbed`
+   - **Does not have the role** → adds it and replies with `ReactionRoleAddedEmbed`
+
+The reply is `ephemeral: true`, so only the clicking member sees the confirmation — keeping the panel channel clean.
+
+```typescript
+// reactionRoles.ts (simplified)
+if (guildMember.roles.cache.has(role.id)) {
+  await guildMember.roles.remove(role.id);
+  embed = replaceAll(client.messages.Embeds.ReactionRoleRemovedEmbed, {
+    "{role}": role.toString(),
+    "{role-name}": role.name,
+  });
+} else {
+  await guildMember.roles.add(role.id);
+  embed = replaceAll(client.messages.Embeds.ReactionRoleAddedEmbed, {
+    "{role}": role.toString(),
+    "{role-name}": role.name,
+  });
+}
+```
+
+## RolesConfig Data Model
+
+Each entry in the `rolesConfig` array on the guild document conforms to the following interface:
+
+```typescript
+interface RolesConfig {
+  role: string;        // Discord role ID (snowflake)
+  emoji: string;       // Unicode or custom emoji string
+  label: string;       // Display text for the button
+  style: ButtonStyle;  // 1=Primary, 2=Secondary, 3=Success, 4=Danger
+  category: string;    // Logical grouping for multi-panel setups
+}
+```
+
+## Removing an Entry
+
+To remove a single role from the reaction role system, run:
+
+```
+/reaction-roles delete role:@RoleName
+```
+
+This pulls the matching entry from `rolesConfig` in the database. Note that any already-posted panels that included this role will continue to show the button visually, but clicking it will no longer produce a result since the config entry no longer exists. Re-send the panel after deleting entries to refresh it.
+
+## Panel Embed Format
+
+The `panelsFormat` field in `messages.yml` under `SelectReactionRoleEmbed` controls how each role line is rendered in the panel embed description. The default format is:
+
+```
+{emoji} » {name}
+```
+
+This produces a list like:
+
+```
+🎮 » Gaming
+🎵 » Music
+🌍 » Europe
+```
+
+You can change the separator or add additional text by editing `panelsFormat` directly in `messages.yml`.
+
+<Tip>
+  Use distinct categories for logically separate panels (e.g. `colors`, `games`, `notifications`). Each `/reaction-roles send` call posts one panel per category, so members can find relevant roles quickly without scrolling through an enormous single list.
+</Tip>

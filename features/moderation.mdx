@@ -1,0 +1,169 @@
+---
+title: "Moderation Tools: Ban, Kick, Warn, and More"
+sidebarTitle: "Moderation"
+description: "Absolet provides ban, kick, warn, clear, nuke, and announce commands with a case-based log system, undo support, and paginated infraction history."
+---
+
+Absolet ships a full suite of moderation commands designed for real server management. Every punitive action — ban, kick, and warn — is recorded with an auto-incrementing case number, the moderator's identity, a timestamp, and the stated reason. Cases survive server restarts and can be reviewed, paginated, and individually removed at any time. Bulk-delete and channel-nuke commands handle message cleanup, while the announce command lets staff broadcast formatted embeds without leaving Discord.
+
+## Commands
+
+<CardGroup cols={2}>
+  <Card title="/ban" icon="gavel">
+    Ban or unban members and browse the server's full ban history.
+  </Card>
+  <Card title="/kick" icon="person-running">
+    Kick a member from the server and optionally remove their kick record later.
+  </Card>
+  <Card title="/warn" icon="triangle-exclamation">
+    Issue a formal warning, remove an existing one, or list all warnings.
+  </Card>
+  <Card title="/clear" icon="trash">
+    Bulk-delete a specified number of messages from the current channel.
+  </Card>
+  <Card title="/nuke" icon="bomb">
+    Delete and instantly recreate a channel, wiping its entire message history.
+  </Card>
+  <Card title="/announce" icon="bullhorn">
+    Send a fully customised embed or message to any text channel.
+  </Card>
+</CardGroup>
+
+---
+
+## /ban
+
+`/ban` is a subcommand group for managing Discord bans.
+
+| Subcommand | Required options | Optional options | Description |
+|------------|-----------------|-----------------|-------------|
+| `add` | `member`, `reason` | `duration` (1–7 days of messages to delete) | Bans the member and records a case |
+| `remove` | `case` (case number **or** user ID), `reason` | — | Unbans the user and marks the case with a removal reason |
+| `list` | — | `member` | Paginates ban records — all bans if no member given, or filtered to one user |
+
+**Behaviour notes:**
+- The bot checks that the executing member's highest role is above the target's before proceeding.
+- `ban remove` accepts either a case number (e.g. `5`) or a raw user ID — useful for users who were never tracked in the database.
+- Removal marks the case `removeReason` field rather than deleting the record, keeping the audit trail intact.
+
+---
+
+## /kick
+
+`/kick` mirrors the ban structure with its own case log.
+
+| Subcommand | Required options | Optional options | Description |
+|------------|-----------------|-----------------|-------------|
+| `add` | `member`, `reason` | — | Kicks the member and records a case |
+| `remove` | `case` (integer), `reason` | — | Marks the kick case as removed |
+| `list` | — | `member` | Paginates all kicks, optionally filtered to one user |
+
+Each kick record stores: `userId`, `reason`, `date`, `staff` (moderator ID), `caseNumber`, and `removeReason`.
+
+---
+
+## /warn
+
+`/warn` issues non-Discord formal warnings that live in Absolet's database.
+
+| Subcommand | Required options | Optional options | Description |
+|------------|-----------------|-----------------|-------------|
+| `add` | `member`, `reason` | — | Adds a warning and increments the guild's case counter |
+| `remove` | `case` (integer), `reason` | — | Marks the warning as removed — does not delete the record |
+| `list` | — | `member` | Paginates all warnings, optionally filtered to one user |
+
+Warnings cannot be issued against users whose role is equal to or higher than the moderator's.
+
+---
+
+## /clear
+
+Bulk-deletes messages in the current channel.
+
+```
+/clear amount:<number>
+```
+
+The `amount` parameter is passed directly to Discord's `bulkDelete` API. Discord limits bulk deletion to messages less than 14 days old; the bot surfaces the API error directly if that limit is exceeded.
+
+---
+
+## /nuke
+
+Wipes a channel completely by cloning it in-place and deleting the original.
+
+```
+/nuke [channel]
+```
+
+- If `channel` is omitted, the current channel is nuked.
+- A **confirmation prompt** must be accepted before the clone-and-delete sequence runs. Declining cancels immediately with no changes.
+- After deletion, the cloned channel is placed at the original channel's position and a confirmation embed is sent.
+
+<Warning>
+  Nuking a channel is **irreversible**. All messages, pins, and webhooks in the original channel are permanently deleted. A confirmation step is always shown, but proceed with caution.
+</Warning>
+
+---
+
+## /announce
+
+Sends an arbitrary message or embed to a channel using a JSON payload.
+
+```
+/announce code:<json> [channel]
+```
+
+- `code` — A JSON string describing the message. Supports a top-level `embed` key (with optional `color` as a hex string like `"#5865F2"`) and any other fields accepted by Discord's message API.
+- `channel` — Defaults to the current channel if omitted.
+
+**Example payload:**
+
+```json
+{
+  "content": "@everyone",
+  "embed": {
+    "title": "Server Update",
+    "description": "Maintenance begins at 8 PM UTC.",
+    "color": "#5865F2"
+  }
+}
+```
+
+If the JSON is malformed or the channel send fails, the bot replies with an ephemeral error message.
+
+---
+
+## Case System
+
+Bans, kicks, and warns all share a single per-guild case counter stored in `PunishModel`. Each time a new infraction is recorded the counter increments by one, guaranteeing unique, sequential case numbers across all action types.
+
+A typical case record contains:
+
+| Field | Description |
+|-------|-------------|
+| `caseNumber` | Auto-incremented integer unique to the guild |
+| `userId` | Discord ID of the punished user |
+| `reason` | Text reason provided by the moderator |
+| `date` | UTC timestamp of the action |
+| `moderator` / `staff` | Discord ID of the executing moderator |
+| `removeReason` | Populated when the case is removed via `ban/kick/warn remove` |
+
+Listing commands display cases as paginated embeds with relative timestamps, making it easy to scroll an infraction history.
+
+---
+
+## Permission Model
+
+Moderation commands perform their own permission checks at runtime:
+
+- `/ban add` requires the `BanMembers` permission on the executing member.
+- `/kick add` requires the `KickMembers` permission.
+- All punitive commands verify that the moderator's **highest role is above** the target's highest role, preventing lateral abuse.
+- The bot also checks its own `bannable` / `kickable` flags before acting, so it will not attempt an action it cannot complete.
+
+---
+
+## Log Channel
+
+All moderation actions are broadcast to the guild's configured log channel. Set it under `/setup → General Settings → Log Channel`. The log includes the case number, target, moderator, and reason so your staff can audit actions without leaving the channel.

@@ -1,0 +1,125 @@
+---
+title: "Fun Commands: Games and Entertainment"
+sidebarTitle: "Fun"
+description: "Reference for Absolet's fun slash commands: connect4, dream, gtn, rps, ship, slots, tic-tac-toe, and wordle."
+---
+
+The fun category brings interactive games and entertainment utilities to your server. Most multiplayer games begin with a challenge prompt that the opponent must accept before the game starts. All commands in this category are available to **@everyone**.
+
+---
+
+## `/connect4`
+
+Challenges another user to a game of Connect 4 on a 7×6 board. Player 1 plays as 🔴 and Player 2 plays as 🟡. Moves are made by clicking column buttons (1–7). The game ends when a player connects four discs in a row (horizontal, vertical, or diagonal), or the board is full (draw).
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required>
+  The user to challenge. They must accept the game challenge before play begins.
+</ParamField>
+
+The game times out after 60 seconds of inactivity. Only the current player's button clicks are accepted; other users' clicks are silently rejected.
+
+---
+
+## `/dream`
+
+Generates an AI image from a text prompt using the Wombo Dream API. Supports 25 distinct art styles.
+
+**Default permission:** @everyone
+
+<ParamField path="prompt" type="String" required>
+  The text description of the image to generate.
+</ParamField>
+
+<ParamField path="style" type="Integer" required>
+  The art style. Available choices include: `Buliojourney v2`, `Realistic v2`, `Spectral v2`, `Flora v2`, `Watercolor v2`, `Blues v2`, `Unrealistic v2`, `VFX v2`, `Expressionism`, `Figure`, `HDR`, `Spectral`, `Comic`, `Soft Touch`, `Splatter`, `Festive`, `Winter`, `Realistic`, `Flora`, `Diorama`, `Abstract`, `Fantastical`, `Vector`, `Cartoonist`, `Bad Trip`.
+</ParamField>
+
+The bot defers while the image is generated and replies with the finished image as an attachment. NSFW-flagged results are blocked.
+
+---
+
+## `/gtn`
+
+**Guess the Number** — A solo game where you try to find a hidden number selected from 25 randomly generated options between 1 and 1000. You have **10 attempts**. Incorrect guesses are highlighted in red; the correct answer is highlighted in green when found.
+
+**Default permission:** @everyone
+
+No parameters. The game times out after 60 seconds of inactivity.
+
+---
+
+## `/rps`
+
+**Rock Paper Scissors** — A two-player game. Both players select their choice (rock 🪨, paper 🧻, or scissors ✂️) privately via buttons. Results are revealed once both have chosen.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required>
+  The user to challenge. They must be part of the game to make a choice.
+</ParamField>
+
+The game times out after 60 seconds. If only one player makes a choice before timeout, the game ends with no winner.
+
+---
+
+## `/ship`
+
+Calculates a compatibility score between two users and renders a ship image with their avatars side-by-side.
+
+**Default permission:** @everyone
+
+<ParamField path="one" type="User" required>
+  The first user.
+</ParamField>
+
+<ParamField path="two" type="User" required={false}>
+  The second user. Defaults to yourself if omitted.
+</ParamField>
+
+The compatibility percentage is randomly generated (0–110%) and displayed as a colored progress bar. The two avatars must belong to different users.
+
+---
+
+## `/slots`
+
+Plays a slot machine game with animated spinning reels. Winning combinations award a payout multiplier:
+
+| Combination | Payout |
+|-------------|--------|
+| 🍒🍒🍒 | ×3.5 |
+| 🍊🍊🍊 | ×3.0 |
+| 🍇🍇🍇 | ×2.0 |
+
+**Default permission:** @everyone
+
+No parameters. The reels animate for several seconds before the final result is shown. This command is purely for entertainment and does not interact with the economy system.
+
+---
+
+## `/tic-tac-toe`
+
+Challenges another user to a game of Tic Tac Toe on a 3×3 grid. Player 1 plays as ✖ and Player 2 plays as ⭕. The starting player is chosen randomly. Moves are made using a 3×3 button grid.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required>
+  The user to challenge. They must accept before the game starts.
+</ParamField>
+
+The game ends when a player wins (three in a row), all nine squares are filled (tie), or the collector times out due to inactivity. Filled squares are disabled after each move.
+
+---
+
+## `/wordle`
+
+Plays the classic Wordle word-guessing game. The bot picks a random 5-letter word. You guess words by sending 5-letter messages in the channel. The board image updates after each guess showing correct (green), misplaced (yellow), and wrong (grey) letters. You have 6 guesses.
+
+**Default permission:** @everyone
+
+No parameters. Guess messages are collected from the channel and automatically deleted. The game idles out after 2 minutes.
+
+<Tip>
+  Type your 5-letter guesses directly as chat messages — no slash command needed after starting the game. The bot listens for messages from the command user only.
+</Tip>

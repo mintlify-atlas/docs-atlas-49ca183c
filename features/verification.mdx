@@ -1,0 +1,99 @@
+---
+title: "Member Verification: CAPTCHA and Direct Methods"
+sidebarTitle: "Verification"
+description: "Absolet protects your server with a verification gate. Choose between CAPTCHA image challenges or one-click direct verification, then assign a role on success."
+---
+
+Absolet's verification system lets you place a gate between new members and the rest of your server. Until a user completes the verification step they won't receive the member role, keeping bots and low-effort raiders from accessing your channels. You can choose between a CAPTCHA challenge that requires reading a generated image, or a one-click direct method for communities that prefer a lighter touch.
+
+## Verification Types
+
+### Captcha
+
+The CAPTCHA method generates a unique **450 × 150 px PNG image** using `@napi-rs/canvas` with a random 7-character uppercase word rendered in the custom `deToks` font on a white background. The user is shown the image alongside **five buttons**, each labelled with a different 7-character word string. Only one button matches the word in the image.
+
+- ✅ **Correct answer** — the bot grants the configured role and replies with the `UserVerifiedEmbed`.
+- ❌ **Wrong answer** — the bot replies with the `VerificationIncorrectEmbed`. All buttons are disabled and colour-coded (the correct answer turns green, all wrong answers turn red) so the user can see what they missed before retrying.
+
+Because the reply is `ephemeral: true`, only the member attempting verification can see the challenge — no spam in your public channels.
+
+### Direct
+
+The direct method skips the image challenge entirely. The user simply clicks the **Verify** button in the verification panel and the bot immediately grants the configured role. This method is ideal for servers that use other screening mechanisms (such as Discord's built-in membership screening or a rules agreement) and just need an easy role-grant trigger.
+
+## Setup
+
+<Steps>
+  <Step title="Configure the verification role">
+    Run `/setup` and navigate to **Verification Settings**. Set the `roleId` to the Discord role you want new members to receive upon successful verification. This role is stored in `guildData.verifySettings.roleId`.
+  </Step>
+  <Step title="Choose a verification type">
+    Still in `/setup` → Verification Settings, set the verification type to either `captcha` or `direct`. This is stored in `guildData.verifySettings.type` and defaults to `captcha` for new guilds.
+  </Step>
+  <Step title="Post the verification panel">
+    Run `/verify` in any channel (or pass an optional `channel` argument to target a specific channel):
+
+    ```
+    /verify channel:#verify
+    ```
+
+    The bot posts an embed defined by the `VerificationMainEmbed` key in `messages.yml`, along with a single **Verify** button whose label, emoji, and style are all configurable under `Buttons.Verification` in `messages.yml`.
+  </Step>
+  <Step title="Members click Verify">
+    When a new member clicks the button, the bot checks their guild's `verifySettings`:
+
+    - **`direct`** — role is granted immediately with no further interaction.
+    - **`captcha`** — a private CAPTCHA challenge is sent as an ephemeral follow-up. On success the role is granted; on failure the result is shown inline without a re-prompt (the member must click the original Verify button again to retry).
+  </Step>
+</Steps>
+
+## Customising the Panel Embed
+
+The verification panel embed is fully customisable via `config/messages.yml`. Look for the `VerificationMainEmbed` key to adjust the title, description, colour, and footer. The `{guild-name}` placeholder is replaced at send time with the server's display name.
+
+```yaml
+# config/messages.yml (example structure)
+Embeds:
+  VerificationMainEmbed:
+    title: "Verify your account"
+    description: "Click the button below to gain access to {guild-name}."
+    color: "#5865F2"
+
+Buttons:
+  Verification:
+    Label: "Verify"
+    Emoji: "✅"
+    Style: "Success"
+```
+
+<Note>
+  You must run `/verify` again after editing `messages.yml` for the changes to appear in the channel. The previously posted panel will not update automatically.
+</Note>
+
+## How the CAPTCHA is Generated
+
+The image is produced by the `generateCaptcha` helper (`src/helpers/images/generateCaptcha.ts`):
+
+```typescript
+import { createCanvas } from "@napi-rs/canvas";
+
+async function generateCaptcha(word: string) {
+  const canvas = createCanvas(450, 150);
+  const ctx = canvas.getContext("2d");
+
+  ctx.font = "70px deToks";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(word, canvas.width / 2, canvas.height / 2);
+
+  const buffer = await canvas.encode("png");
+  return buffer;
+}
+```
+
+The word is a randomly generated 7-character uppercase string. Four additional random 7-character strings are generated as decoys, then all five are shuffled before being rendered as Discord buttons. This means there is always exactly a 1-in-5 chance of guessing correctly at random.
+
+<Warning>
+  Ensure the `deToks` font file is present in the expected fonts directory before starting the bot. Missing font files will cause canvas rendering to fall back to a system default, which may significantly change the visual appearance of the CAPTCHA.
+</Warning>

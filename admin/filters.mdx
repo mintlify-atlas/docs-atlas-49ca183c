@@ -1,0 +1,83 @@
+---
+title: "Content Filters: Anti-Links, Anti-Invites, Ghost Ping"
+sidebarTitle: "Filters"
+description: "Absolet can automatically delete messages containing links or Discord invites and detect ghost pings. Configure bypass roles and per-location exceptions via /setup."
+---
+
+Absolet ships three automatic content filters that work silently in the background, deleting offending messages and notifying authors or moderators without any manual intervention. Each filter is toggled independently, so you can enable only the protections your server needs. All filter configuration lives inside `/setup` → **Filters Settings**.
+
+## The Three Filters
+
+### 🔗 Anti-Links
+
+When enabled, Absolet scans every incoming message for URLs. If a link is detected the message is deleted immediately and the bot sends a warning embed addressed to the author in the same channel, letting them know their message was removed and why.
+
+**Use case:** Channels where you want to prevent members from sharing external sites — such as a support channel, a general chat with younger audiences, or any space where unsolicited links are unwanted.
+
+---
+
+### ⚠️ Anti-Invites
+
+When enabled, Absolet watches for Discord invite links in the format `discord.gg/…`. If one is found the message is deleted and the author receives a warning embed in the channel.
+
+**Use case:** Preventing members from advertising other Discord servers. This is a more targeted version of Anti-Links — if you only want to block invites (but allow normal links), enable Anti-Invites without enabling Anti-Links.
+
+---
+
+### 🔉 Anti-Ghost Ping
+
+A ghost ping happens when a user mentions another user (or a role) and then immediately deletes the message, so the pinged person sees a notification but cannot read its content. When Anti-Ghost Ping is enabled, Absolet detects this behaviour and logs an alert to the configured **Log Channel** using a `GhostPingDetectedEmbed`. The offending message content, the sender, and the target of the ping are all included in the log.
+
+<Note>
+  The Log Channel must be set in `/setup` → **General Settings** for ghost ping detections to be logged. If no log channel is configured, detections will still be processed but the alert will not be sent anywhere.
+</Note>
+
+---
+
+## Enabling and Configuring Filters
+
+<Steps>
+  <Step title="Open the dashboard">
+    Run `/setup` in any channel where Absolet has permission to reply.
+  </Step>
+  <Step title="Select Filters Settings">
+    Use the selection menu at the bottom of the dashboard embed to navigate to **🕵️ Filters Settings**.
+  </Step>
+  <Step title="Toggle each filter">
+    Click the button for the filter you want to change — **Anti-Links**, **Anti-Invites**, or **Anti-Ghost Ping** — then choose **Yes** (enable) or **No** (disable) from the confirmation buttons that appear.
+  </Step>
+  <Step title="Set Bypass Roles (optional)">
+    Click **Bypass Roles** and select any roles whose members should be exempt from all link and invite checks. Members holding at least one bypass role can post links and invites freely regardless of which filters are active.
+  </Step>
+  <Step title="Configure In Tickets (optional)">
+    Click **In Tickets** and choose whether filters should also apply inside open ticket channels. By default (`false`) filters do not run inside tickets, so support staff and users can share links freely within a ticket thread.
+  </Step>
+</Steps>
+
+## Settings Reference
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Anti-Links** | Boolean | `false` | Delete messages containing any URL. |
+| **Anti-Invites** | Boolean | `false` | Delete messages containing `discord.gg/…` invite links. |
+| **Anti-Ghost Ping** | Boolean | `false` | Log an alert when a user pings someone and deletes the message. |
+| **Bypass Roles** | Roles | `[]` | Roles exempt from Anti-Links and Anti-Invites. |
+| **In Tickets** | Boolean | `false` | Apply link/invite filters inside ticket channels. |
+
+---
+
+## User Blacklisting
+
+In addition to automated message filters, you can also temporarily ban a specific user from using **any** Absolet command using `/blacklist`:
+
+```
+/blacklist <user> <duration> <reason>
+```
+
+| Option | Type | Required | Description |
+|---|---|---|---|
+| `user` | User | ✅ | The Discord user to blacklist. |
+| `duration` | String | ✅ | How long the blacklist lasts. Accepts human-readable durations such as `1h`, `6h`, `1d`, `7d`. |
+| `reason` | String | ✅ | The reason for the blacklist, recorded in the confirmation embed. |
+
+While blacklisted, the user's attempts to run any slash command are silently blocked until the duration expires. The blacklist is stored per-user and automatically lifts once the expiry timestamp is reached.

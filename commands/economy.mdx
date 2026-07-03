@@ -1,0 +1,155 @@
+---
+title: "Economy Commands: Balance, Work, Shop, and Games"
+sidebarTitle: "Economy"
+description: "Reference for Absolet's economy slash commands: balance, work, daily, weekly, rob, pay, deposit, withdraw, shop, and blackjack."
+---
+
+Absolet's economy system revolves around two balances per user: a **wallet** (cash on hand) and a **bank** (secured savings). The currency symbol, reward amounts, and cooldowns are all configured server-side via `/setup`. Every command in this category is available to **@everyone** by default, with the exception of game commands that require a bet.
+
+<Tip>
+  Configure the coin emoji, daily/weekly reward amounts, and min/max work earnings in `/setup` under **Economy Settings**.
+</Tip>
+
+---
+
+## `/balance`
+
+Displays a user's current wallet balance, bank balance, and total net worth.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user to check. Defaults to yourself.
+</ParamField>
+
+---
+
+## `/work`
+
+Earns a random amount of money added to your **wallet**. The amount is between the server-configured `minMoney` and `maxMoney` values.
+
+**Default permission:** @everyone (cooldown: 1 hour)
+
+No parameters.
+
+<Note>
+  The 1-hour cooldown is enforced via `config/commands.yml`. Attempting to work before the cooldown expires will be blocked.
+</Note>
+
+---
+
+## `/daily`
+
+Claims a daily salary reward deposited directly into your **bank** account. Can only be claimed once per 24 hours. The reward amount is set via `/setup` (Economy Settings → Daily Reward).
+
+**Default permission:** @everyone
+
+No parameters. The bot replies with a timestamp showing when you can claim again if the cooldown is active.
+
+---
+
+## `/weekly`
+
+Claims a weekly salary reward deposited into your **bank** account. Can only be claimed once every 7 days.
+
+**Default permission:** @everyone
+
+No parameters.
+
+---
+
+## `/rob`
+
+Attempts to steal cash from another user's **wallet**. There is a 50% chance of success. On success, between 50% and 100% of the victim's wallet is stolen. On failure, the same random amount is deducted from your own wallet as a penalty.
+
+**Default permission:** @everyone (cooldown: 12 hours)
+
+<ParamField path="user" type="User" required>
+  The user to attempt to rob. Cannot target yourself or a bot.
+</ParamField>
+
+<Warning>
+  The target must have at least 1 coin in their wallet. Robbing fails immediately if the victim has an empty wallet.
+</Warning>
+
+---
+
+## `/pay`
+
+Transfers money from your **wallet** to another user's **bank**.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required>
+  The recipient. Cannot pay yourself or a bot.
+</ParamField>
+
+<ParamField path="amount" type="Number" required>
+  The amount to transfer (minimum 1). Must not exceed your current wallet balance.
+</ParamField>
+
+---
+
+## `/deposit`
+
+Moves money from your **wallet** into your **bank**.
+
+**Default permission:** @everyone
+
+<ParamField path="amount" type="Number" required={false}>
+  The amount to deposit (minimum 1). Omitting this deposits your entire wallet balance.
+</ParamField>
+
+---
+
+## `/withdraw`
+
+Moves money from your **bank** into your **wallet**.
+
+**Default permission:** @everyone
+
+<ParamField path="amount" type="Number" required={false}>
+  The amount to withdraw (minimum 1). Omitting this withdraws your entire bank balance.
+</ParamField>
+
+---
+
+## `/shop`
+
+Browses the server shop or purchases an item by name. Items grant a configured role upon purchase and deduct the item price from your **wallet**.
+
+**Default permission:** @everyone
+
+<ParamField path="name" type="String" required={false}>
+  The name of the item to purchase. Omitting this displays the full shop catalogue (paginated, 10 items per page).
+</ParamField>
+
+Purchasing an item will fail if:
+- You do not have enough wallet balance.
+- You do not have the required role (if `role-required` is set).
+- You already own the role granted by the item.
+
+---
+
+## `/blackjack`
+
+Play a game of Blackjack against the bot. The dealer stands at 17. You decide to **Hit** or **Stand** using buttons. The reward multiplier for a win is configured in `/setup` (Economy Settings → Blackjack Reward).
+
+**Default permission:** @everyone
+
+<ParamField path="amount" type="Integer" required>
+  The amount to bet from your **wallet** (minimum 0).
+</ParamField>
+
+The bot generates a full 52-card deck (4 suits × 13 ranks) and renders the board as an image. Aces count as 11 when the hand value is ≤ 11, otherwise 1.
+
+| Outcome | Result |
+|---------|--------|
+| Player > Dealer or Dealer busts | Win: bet × `blackjackReward` multiplier added to wallet |
+| Player < Dealer | Lose: bet deducted from wallet |
+| Player busts (> 21) | Lose: bet deducted from wallet |
+| Tie | No change |
+
+<Note>
+  The game times out after 60 seconds of inactivity. Your balance is saved at the end of each game regardless of outcome.
+</Note>

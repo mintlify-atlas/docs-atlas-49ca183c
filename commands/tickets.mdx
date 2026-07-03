@@ -1,0 +1,109 @@
+---
+title: "Ticket Commands for Staff and Users"
+sidebarTitle: "Tickets"
+description: "Reference for all ticket slash commands in Absolet: add, alert, claim, close, open, remove, and rename — used inside active ticket channels."
+---
+
+All ticket commands must be run **inside an active ticket channel**. Absolet identifies whether a channel is a valid ticket by looking up its channel ID in the database. If the current channel is not a registered ticket, all commands in this category will reply with an error. Staff commands (`add`, `alert`, `claim`, `rename`) require the **Staff** or **Admin** permission level; `close` and `open` are available to all staff.
+
+<Note>
+  Ticket panels are created and configured with `/ticket-manage setup`. See the [Admin Commands](/commands/admin) reference for panel setup instructions.
+</Note>
+
+---
+
+## `/add`
+
+Adds a user to the current ticket channel, granting them view, send, and attach-files permissions.
+
+**Default permission:** Staff, Owner
+
+<ParamField path="user" type="User" required>
+  The user to add to the ticket.
+</ParamField>
+
+The user's ID is also recorded in the `usersInTicket` list on the ticket document so that their permissions can be revoked on close.
+
+---
+
+## `/alert`
+
+Sends a direct message to the ticket owner alerting them that their ticket requires attention. Useful when a user has gone inactive.
+
+**Default permission:** Staff, Owner
+
+No parameters. The ticket owner is determined from the stored `ownerId` on the ticket record. If the user has DMs disabled, the bot will reply with an error message.
+
+---
+
+## `/claim`
+
+Claims the current ticket for the responding staff member. Once claimed:
+
+- The claiming staff member receives `ViewChannel` and `ManageChannels` permissions.
+- All other staff roles are hidden from the channel.
+- The ticket control buttons are updated to reflect the claimed state.
+
+**Default permission:** Staff, Owner
+
+No parameters. A ticket cannot be claimed if it has already been claimed by another staff member.
+
+<Note>
+  Only one staff member may hold a claim on a ticket at a time. The name of the claiming staff member is stored and displayed if someone else tries to claim.
+</Note>
+
+---
+
+## `/close`
+
+Closes the current ticket. On close:
+
+- All users in `usersInTicket` lose `ViewChannel` permission.
+- A control panel is posted with buttons for **Transcript**, **Reopen**, and **Delete**.
+- The ticket is marked `isClosed: true` in the database.
+
+**Default permission:** Staff, Owner
+
+No parameters. Running `/close` on an already-closed ticket replies with an error.
+
+---
+
+## `/open`
+
+Reopens a previously closed ticket. On open:
+
+- All users in `usersInTicket` regain `ViewChannel` permission.
+- The close-control message is deleted.
+- The ticket is marked `isClosed: false`.
+
+**Default permission:** Staff, Owner
+
+No parameters. Running `/open` on an active (not closed) ticket replies with an error.
+
+---
+
+## `/remove`
+
+Removes a user from the current ticket channel, revoking all their channel permission overwrites.
+
+**Default permission:** Staff, Owner
+
+<ParamField path="user" type="User" required>
+  The user to remove from the ticket.
+</ParamField>
+
+The user's ID is also removed from the `usersInTicket` list. If the user was never added, the bot replies with an error.
+
+---
+
+## `/rename`
+
+Renames the current ticket channel.
+
+**Default permission:** Admin
+
+<ParamField path="name" type="String" required>
+  The new channel name for this ticket.
+</ParamField>
+
+The new name is applied to the Discord channel and persisted in the ticket's `channelName` field.

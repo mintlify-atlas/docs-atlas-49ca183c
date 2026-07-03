@@ -1,0 +1,650 @@
+---
+title: "Admin Commands: Setup, Backups, Giveaways, and More"
+sidebarTitle: "Admin"
+description: "Reference for Absolet's admin-only slash commands including setup, backup, ticket-manage, giveaway, reaction-roles, verify, custom-commands, and economy/level tools."
+---
+
+The admin category contains Absolet's most powerful management commands. Most of these commands require the **Staff** or **Owner** permission level as defined in `config/commands.yml`; a handful of the most sensitive ones are restricted to **Admin** or **Owner** only. These commands cover everything from first-time server configuration to live giveaway management and XP manipulation.
+
+---
+
+## `/setup`
+
+Opens an interactive dashboard for configuring the bot across all major feature areas, including general settings, ticket configuration, welcome/goodbye messages, verification, levels, filters, economy, starboard, and sticky roles. All settings are saved to the database in real-time using button-driven prompts.
+
+**Default permission:** Staff, Owner
+
+<Note>
+  The welcome message builder supports embed JSON from [embed.strider.top](https://embed.strider.top/) and a rich set of placeholders such as `{user-tag}`, `{guild-name}`, `{memberCount}`, `{inviter-mention}`, and `{card-url}`.
+</Note>
+
+---
+
+## `/backup`
+
+Manages server backup snapshots (channels, categories, emojis).
+
+**Default permission:** Owner
+
+### Subcommands
+
+#### `create`
+Creates a new backup of the current server. Messages are excluded from the snapshot.
+
+#### `list`
+Displays a paginated list of all saved backups, showing channels, emoji count, creation time, and backup ID.
+
+#### `load`
+Restores a backup by ID. Requires confirmation — all current channels will be deleted and replaced.
+
+<ParamField path="id" type="String" required>
+  The ID of the backup to load.
+</ParamField>
+
+#### `delete`
+Permanently removes a backup by ID.
+
+<ParamField path="id" type="String" required>
+  The ID of the backup to delete.
+</ParamField>
+
+<Warning>
+  Running `/backup load` is destructive. All existing channels are deleted and recreated from the backup data. A confirmation prompt is shown before the operation proceeds.
+</Warning>
+
+---
+
+## `/ticket-manage`
+
+Creates and manages ticket panel configurations for the server.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `setup`
+Launches a step-by-step interactive panel builder (name, emoji, category, style, roles, questions). Optionally creates a sub-category panel nested under an existing panel.
+
+<ParamField path="is-subcategory" type="Boolean" required={false}>
+  Set to `true` to attach this panel under an existing parent panel.
+</ParamField>
+
+#### `list`
+Displays all configured ticket panels with their ID, name, emoji, category, style, and assigned staff roles.
+
+#### `send`
+Posts the ticket creation panel to a channel.
+
+<ParamField path="channel" type="Channel" required={false}>
+  The text channel to send the panel to. Defaults to the current channel.
+</ParamField>
+
+#### `delete`
+Presents a select menu to choose and permanently remove an existing ticket panel.
+
+#### `edit`
+Opens an interactive editor for an existing panel's name, emoji, category, style, roles, and questions.
+
+---
+
+## `/giveaway`
+
+Full-featured giveaway lifecycle management via an interactive button menu.
+
+**Default permission:** Staff, Owner
+
+The command opens a panel with five actions:
+
+| Action | Description |
+|--------|-------------|
+| **Create** | Start the creation flow (channel, time, winners, prize, description, image, requirements) |
+| **Pause** | Pause an active giveaway |
+| **Resume** | Resume a paused giveaway |
+| **Reroll** | Pick new winners from an ended giveaway |
+| **End** | Force-end an active giveaway early |
+
+Requirements (levels, invites, messages) can optionally be set during creation.
+
+<Note>
+  Time values use the `ms` format: `30m`, `1h`, `2d`, etc. The creation flow times out after 3 minutes of inactivity.
+</Note>
+
+---
+
+## `/reaction-roles`
+
+Manages button-based reaction role panels.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `add`
+Registers a new role entry in a named category.
+
+<ParamField path="category" type="String" required>
+  The category name for this role (e.g., `countries`, `notifications`).
+</ParamField>
+
+<ParamField path="role" type="Role" required>
+  The role to grant when the button is clicked.
+</ParamField>
+
+<ParamField path="emoji" type="String" required>
+  The emoji displayed on the button.
+</ParamField>
+
+<ParamField path="label" type="String" required>
+  The text label shown on the button.
+</ParamField>
+
+<ParamField path="style" type="String" required>
+  Button color. Choices: `Primary`, `Secondary`, `Success`, `Danger`.
+</ParamField>
+
+#### `list`
+Displays all registered reaction role entries with pagination.
+
+#### `send`
+Posts the panel embed with role buttons to a channel.
+
+<ParamField path="category" type="String" required>
+  The category of roles to include in this panel.
+</ParamField>
+
+<ParamField path="title" type="String" required>
+  The embed title.
+</ParamField>
+
+<ParamField path="description" type="String" required>
+  The embed description. Use `\n` for newlines.
+</ParamField>
+
+<ParamField path="channel" type="Channel" required={false}>
+  Target text channel. Defaults to current channel.
+</ParamField>
+
+<ParamField path="display-label" type="Boolean" required={false}>
+  Whether to show the role label text on the button.
+</ParamField>
+
+#### `delete`
+Removes a reaction role entry by role.
+
+<ParamField path="role" type="Role" required>
+  The role whose entry should be removed.
+</ParamField>
+
+---
+
+## `/verify`
+
+Posts the verification embed (with a verify button) to a channel. The verification role must be configured via `/setup` first.
+
+**Default permission:** Staff, Owner
+
+<ParamField path="channel" type="Channel" required={false}>
+  The channel to send the verification embed to. Defaults to the current channel.
+</ParamField>
+
+---
+
+## `/suggestion`
+
+Staff tool for accepting or declining user suggestions submitted via `/suggest`.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `accept`
+Marks a suggestion as Accepted and posts the staff reply on the original suggestion embed.
+
+<ParamField path="token" type="String" required>
+  The message ID / token of the suggestion to accept.
+</ParamField>
+
+<ParamField path="reply" type="String" required>
+  The staff response message to display.
+</ParamField>
+
+#### `decline`
+Marks a suggestion as Declined.
+
+<ParamField path="token" type="String" required>
+  The message ID / token of the suggestion to decline.
+</ParamField>
+
+<ParamField path="reply" type="String" required>
+  The staff response message to display.
+</ParamField>
+
+---
+
+## `/custom-commands`
+
+Creates, deletes, and lists server-specific custom slash commands that reply with a configured embed.
+
+**Default permission:** Owner
+
+### Subcommands
+
+#### `create`
+Launches an interactive builder for a new custom command (name, description, response, permission roles). The response must be a JSON embed object from [glitchii.github.io/embedbuilder](https://glitchii.github.io/embedbuilder).
+
+#### `delete`
+
+<ParamField path="name" type="String" required>
+  The name of the custom command to remove.
+</ParamField>
+
+#### `list`
+Displays all custom commands and their permission roles with pagination.
+
+---
+
+## `/role`
+
+Manages temporary timed roles assigned to members.
+
+**Default permission:** Owner
+
+### Subcommands
+
+#### `add`
+Assigns a role to a user for a limited duration.
+
+<ParamField path="user" type="User" required>
+  The member to assign the role to.
+</ParamField>
+
+<ParamField path="role" type="Role" required>
+  The role to assign.
+</ParamField>
+
+<ParamField path="time" type="String" required>
+  Duration string (e.g., `10m`, `1h`, `1d`).
+</ParamField>
+
+#### `remove`
+Removes a temporary role assignment record and optionally strips the role immediately.
+
+<ParamField path="user" type="User" required>
+  The member whose temporary role record to delete.
+</ParamField>
+
+<ParamField path="role" type="Role" required>
+  The role to remove the record for.
+</ParamField>
+
+<ParamField path="remove" type="Boolean" required={false}>
+  If `true`, also removes the role from the user immediately.
+</ParamField>
+
+#### `list`
+Lists all active temporary role assignments.
+
+---
+
+## `/role-prefixes`
+
+Attaches text prefixes to roles, displayed in the rank card and other places.
+
+**Default permission:** Admin
+
+### Subcommands
+
+#### `set`
+
+<ParamField path="role" type="Role" required>
+  The role to set the prefix for.
+</ParamField>
+
+<ParamField path="prefix" type="String" required>
+  The prefix string (e.g., `[VIP]`).
+</ParamField>
+
+#### `remove`
+
+<ParamField path="role" type="Role" required>
+  The role whose prefix should be removed.
+</ParamField>
+
+#### `list`
+Displays all role prefixes with pagination.
+
+---
+
+## `/shop-manage`
+
+Manages items in the economy shop.
+
+**Default permission:** Admin
+
+### Subcommands
+
+#### `add`
+Adds a new purchasable item.
+
+<ParamField path="name" type="String" required>
+  The item name.
+</ParamField>
+
+<ParamField path="description" type="String" required>
+  The item description shown in the shop.
+</ParamField>
+
+<ParamField path="price" type="Integer" required>
+  The cost of the item (minimum 0).
+</ParamField>
+
+<ParamField path="role-granted" type="Role" required>
+  The role given to a user upon purchase.
+</ParamField>
+
+<ParamField path="role-required" type="Role" required={false}>
+  A role the buyer must have in order to purchase the item.
+</ParamField>
+
+<ParamField path="stock" type="Integer" required={false}>
+  Maximum number of purchases. `null` = unlimited; `0` = out of stock.
+</ParamField>
+
+#### `remove`
+Presents a select menu to choose and remove an existing shop item.
+
+#### `list`
+Displays all shop items with pagination.
+
+---
+
+## `/blacklist`
+
+Temporarily prevents a user from using bot commands.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The user to blacklist.
+</ParamField>
+
+<ParamField path="duration" type="String" required>
+  How long the blacklist lasts (e.g., `1h`, `7d`).
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for blacklisting.
+</ParamField>
+
+---
+
+## `/faq`
+
+Creates and publishes interactive FAQ pages with buttons.
+
+**Default permission:** Admin
+
+### Subcommands
+
+#### `setup`
+Opens an interactive builder to create a FAQ page (name, main message, and buttons with labels, emojis, styles, and individual messages).
+
+#### `send`
+Posts a previously created FAQ page to the current channel.
+
+<ParamField path="name" type="String" required>
+  The name of the FAQ page to send.
+</ParamField>
+
+---
+
+## `/poll`
+
+Sends a poll message to a channel with emoji reactions for each choice.
+
+**Default permission:** Admin
+
+<ParamField path="title" type="String" required>
+  The poll title.
+</ParamField>
+
+<ParamField path="description" type="String" required>
+  The poll description.
+</ParamField>
+
+<ParamField path="type" type="String" required>
+  Vote mode: `single` (one vote per user) or `multiple` (multiple votes allowed).
+</ParamField>
+
+<ParamField path="choice1" type="String" required>
+  First choice option.
+</ParamField>
+
+<ParamField path="choice2" type="String" required>
+  Second choice option.
+</ParamField>
+
+<ParamField path="choice3 – choice10" type="String" required={false}>
+  Up to eight additional choice options.
+</ParamField>
+
+<ParamField path="channel" type="Channel" required={false}>
+  Target text channel. Defaults to current channel.
+</ParamField>
+
+---
+
+## `/snipe`
+
+Retrieves recently deleted messages from a channel.
+
+**Default permission:** Admin
+
+<ParamField path="channel" type="Channel" required={false}>
+  The channel to snipe messages from. Defaults to the current channel.
+</ParamField>
+
+---
+
+## `/say`
+
+Sends a plain text message in the current channel as the bot.
+
+**Default permission:** Admin
+
+<ParamField path="message" type="String" required>
+  The message text to send.
+</ParamField>
+
+---
+
+## `/addemoji`
+
+Copies an emoji from another server and adds it to the current server.
+
+**Default permission:** Admin
+
+<ParamField path="emoji" type="String" required>
+  The source emoji (must be a custom Discord emoji or standard Unicode emoji with a parseable ID).
+</ParamField>
+
+<ParamField path="name" type="String" required={false}>
+  Override name for the new emoji. Defaults to the source emoji's name.
+</ParamField>
+
+---
+
+## `/givelevel`
+
+Adds levels to a user's profile.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  Number of levels to add (minimum 1).
+</ParamField>
+
+---
+
+## `/givexp`
+
+Adds XP to a user's profile.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  Amount of XP to add (minimum 1).
+</ParamField>
+
+---
+
+## `/setlevel`
+
+Overrides a user's current level.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="level" type="Integer" required>
+  The level to set (minimum 1).
+</ParamField>
+
+---
+
+## `/setxp`
+
+Overrides a user's current XP value.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  The XP value to set (minimum 0).
+</ParamField>
+
+---
+
+## `/givemoney`
+
+Adds money to a user's wallet or bank account.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  Amount to give (minimum 1).
+</ParamField>
+
+<ParamField path="where" type="String" required={false}>
+  Destination: `Bank` or `Wallet`. Defaults to `bank`.
+</ParamField>
+
+---
+
+## `/setmoney`
+
+Sets a user's wallet or bank balance to an exact amount.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  Balance to set (minimum 0).
+</ParamField>
+
+<ParamField path="where" type="String" required={false}>
+  Target account: `Bank` or `Wallet`. Defaults to `bank`.
+</ParamField>
+
+---
+
+## `/take-money`
+
+Deducts money from a user's wallet or bank account.
+
+**Default permission:** Admin
+
+<ParamField path="user" type="User" required>
+  The target user.
+</ParamField>
+
+<ParamField path="amount" type="Integer" required>
+  Amount to take (minimum 1).
+</ParamField>
+
+<ParamField path="where" type="String" required>
+  Source account: `Bank` or `Wallet`.
+</ParamField>
+
+---
+
+## `/manage`
+
+Advanced server management covering temporary voice channels and statistics counter channels.
+
+**Default permission:** Admin
+
+### Subcommand group: `voice-channels`
+
+#### `voice-channels send`
+Posts the voice channel interface panel.
+
+<ParamField path="channel" type="Channel" required={false}>
+  Target text channel.
+</ParamField>
+
+#### `voice-channels setup`
+Creates the category, generator voice channel, and interface text channel automatically.
+
+#### `voice-channels delete`
+Deletes the registered generator channel and clears it from the database.
+
+### Subcommand group: `stats`
+
+#### `stats setup`
+Creates a stats category with three counter channels (All Members, Members, Bots).
+
+<ParamField path="channel" type="Integer" required>
+  Channel type for counters: `2` = voice channel (recommended) or `0` = text channel.
+</ParamField>
+
+#### `stats edit`
+Updates the name template of a stats counter channel. Supports placeholders `{all-members}`, `{members}`, `{bots}`.
+
+<ParamField path="channel" type="Channel" required>
+  The stats counter channel to rename.
+</ParamField>
+
+<ParamField path="name" type="String" required>
+  The new name template (e.g., `Members: {members}`).
+</ParamField>
+
+#### `stats delete`
+Removes a counter channel from the database.
+
+<ParamField path="channel" type="Channel" required>
+  The stats channel to unregister.
+</ParamField>
+
+#### `stats check`
+Scans for and removes stale counter channels that no longer exist in the server.

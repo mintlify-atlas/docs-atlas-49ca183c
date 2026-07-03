@@ -1,0 +1,252 @@
+---
+title: "Configure Absolet: config.yml and commands.yml Reference"
+sidebarTitle: "Configuration"
+description: "Complete reference for Absolet's two YAML configuration files — config.yml for global settings and commands.yml for per-command enable/permission controls."
+---
+
+Absolet's runtime behavior is controlled entirely by two YAML files in the `config/` directory. `config/config.yml` holds global settings — your bot token, database URI, embed color, and activity rotation. `config/commands.yml` gives you fine-grained control over every slash command: whether it's active at all, and which server roles are allowed to invoke it. Both files are parsed once when the bot process starts, so any changes require a restart to take effect.
+
+<Warning>
+  Config files are loaded **once at startup**. After editing either `config/config.yml` or `config/commands.yml`, you must restart the bot process for changes to take effect. Running `bun run dev` (watch mode) will restart automatically on file saves.
+</Warning>
+
+---
+
+## config/config.yml
+
+This file contains all global bot settings. There are three top-level sections: `GeneralSettings`, `DatabaseSettings`, and `ActivitySettings`.
+
+```yaml title="config/config.yml"
+GeneralSettings:
+  Token: "YOUR_BOT_TOKEN_HERE"
+  LicenseKey: "YOUR_LICENSE_KEY_HERE"
+  EmbedColor: "#E74C3C"
+
+DatabaseSettings:
+  Uri: "mongodb+srv://<user>:<password>@<cluster>.mongodb.net/Absolet3"
+
+ActivitySettings:
+  Enabled: true
+  Activities:
+    - ["Watching", "my community", "dnd"]
+    - ["Playing", "play.example.net", "dnd"]
+    - ["Listening", "your requests", "online"]
+  Interval: "1m"
+```
+
+### GeneralSettings
+
+<Accordion title="GeneralSettings.Token">
+  **Type:** `string` — Required
+
+  Your Discord bot token, obtained from the [Discord Developer Portal](https://discord.com/developers/applications) under your application's **Bot** page.
+
+  ```yaml
+  GeneralSettings:
+    Token: "MTMwMTc3Nzk2NjUw..."
+  ```
+
+  <Warning>
+    Never share or commit your bot token. Anyone with this token has full control over your bot. Regenerate it immediately from the Developer Portal if it is ever exposed.
+  </Warning>
+</Accordion>
+
+<Accordion title="GeneralSettings.LicenseKey">
+  **Type:** `string` — Required
+
+  Your Absolet license key. This is provided when you purchase or are granted access to Absolet and is validated on startup.
+
+  ```yaml
+  GeneralSettings:
+    LicenseKey: "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+  ```
+</Accordion>
+
+<Accordion title="GeneralSettings.EmbedColor">
+  **Type:** `string` (hex color) — Default: `#E74C3C`
+
+  The accent color used in all Discord embeds the bot sends. Accepts any CSS-style hex color string.
+
+  ```yaml
+  GeneralSettings:
+    EmbedColor: "#E74C3C"   # Red (default)
+    # EmbedColor: "#5865F2" # Discord Blurple
+    # EmbedColor: "#2ECC71" # Green
+  ```
+</Accordion>
+
+### DatabaseSettings
+
+<Accordion title="DatabaseSettings.Uri">
+  **Type:** `string` — Required
+
+  A valid MongoDB connection string. Absolet uses [Mongoose](https://mongoosejs.com/) to connect, so any URI that Mongoose accepts will work — local instances, Docker containers, and MongoDB Atlas clusters are all supported.
+
+  ```yaml
+  DatabaseSettings:
+    # MongoDB Atlas
+    Uri: "mongodb+srv://<user>:<password>@<cluster>.mongodb.net/Absolet3"
+
+    # Local instance
+    # Uri: "mongodb://localhost:27017/Absolet3"
+  ```
+
+  <Tip>
+    The database name at the end of the URI (e.g. `Absolet3`) will be created automatically by MongoDB if it does not already exist.
+  </Tip>
+</Accordion>
+
+### ActivitySettings
+
+Controls the rotating status messages shown on your bot's Discord profile.
+
+<Accordion title="ActivitySettings.Enabled">
+  **Type:** `boolean` — Default: `true`
+
+  Set to `false` to disable activity rotation entirely. The bot will remain online with no custom status.
+
+  ```yaml
+  ActivitySettings:
+    Enabled: false
+  ```
+</Accordion>
+
+<Accordion title="ActivitySettings.Activities">
+  **Type:** `array` of `[type, text, status]` tuples — Required when `Enabled: true`
+
+  Each element is a three-item array that defines one activity entry in the rotation:
+
+  | Index | Field | Accepted Values |
+  |---|---|---|
+  | 0 | **type** | `Watching`, `Playing`, `Listening` |
+  | 1 | **text** | Any string displayed after the type label |
+  | 2 | **status** | `online`, `dnd`, `idle` |
+
+  ```yaml
+  ActivitySettings:
+    Activities:
+      - ["Watching",  "my community",   "dnd"]
+      - ["Playing",   "play.example.net", "dnd"]
+      - ["Listening", "your requests",  "online"]
+  ```
+
+  The `status` value changes the colored indicator on the bot's avatar as well:
+  - `online` → green dot
+  - `idle` → yellow crescent moon
+  - `dnd` → red minus (Do Not Disturb)
+</Accordion>
+
+<Accordion title="ActivitySettings.Interval">
+  **Type:** `string` (duration) — Default: `"1m"`
+
+  How long each activity is shown before the bot rotates to the next one. Uses the [`ms`](https://github.com/vercel/ms) library format, so values like `"30s"`, `"1m"`, `"5m"`, or `"1h"` are all valid.
+
+  ```yaml
+  ActivitySettings:
+    Interval: "1m"   # Rotate every 60 seconds
+  ```
+</Accordion>
+
+---
+
+## config/commands.yml
+
+This file controls every slash command Absolet can register. Each top-level key maps to a command using **PascalCase** — for example, the `/ticket-manage` slash command is configured under the key `TicketManage`, and `/now-playing` maps to `Nowplaying`.
+
+Every command entry supports the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `Enabled` | `boolean` | Whether the command is loaded and registered at all |
+| `Permissions` | `string[]` | List of role names (or `@everyone`) that can use the command |
+| `Cooldown` | `string` | *(Optional)* Per-user cooldown in `ms` format, e.g. `"1h"` |
+
+### Permission Levels
+
+Permissions in `commands.yml` work by matching server role **names** (not IDs) against the roles a member has at the time they invoke the command.
+
+- **`@everyone`** — any server member can use the command, regardless of their roles.
+- **A role name** (e.g. `"Staff"`, `"Admin"`, `"Owner"`) — only members who hold a role with that exact name can invoke the command.
+- **Multiple role names** — the member only needs to hold **one** of the listed roles (OR logic).
+
+<Note>
+  Role names are **case-sensitive** and must exactly match the role names configured in your Discord server. `"Staff"` and `"staff"` are treated as different values.
+</Note>
+
+The conventional role tiers used in the default `commands.yml` are:
+
+| Role name | Intended audience |
+|---|---|
+| `@everyone` | All server members |
+| `Staff` | Moderators and support staff |
+| `Admin` | Server administrators |
+| `Owner` | Server owner(s) and trusted admins |
+
+### Representative Examples
+
+```yaml title="config/commands.yml"
+# Open to all members
+Help:
+  Enabled: true
+  Permissions:
+    - "@everyone"
+
+# Staff and Owner only — moderation command
+Ban:
+  Enabled: true
+  Permissions:
+    - "Staff"
+    - "Owner"
+
+# Music — open to everyone
+Play:
+  Enabled: true
+  Permissions:
+    - "@everyone"
+
+# Economy — open to everyone, no cooldown override needed here
+Balance:
+  Enabled: true
+  Permissions:
+    - "@everyone"
+
+# Economy — open to everyone with a 12-hour cooldown
+Rob:
+  Enabled: true
+  Cooldown: "12h"
+  Permissions:
+    - "@everyone"
+
+# Admin-only ticket management command (note PascalCase key for /ticket-manage)
+TicketManage:
+  Enabled: true
+  Permissions:
+    - "Staff"
+    - "Owner"
+
+# Disabled command — will not appear in Discord at all
+Eval:
+  Enabled: false
+  Permissions:
+    - "Owner"
+```
+
+### PascalCase Key Mapping
+
+The internal command key is derived from the slash command name by capitalizing each hyphen-separated word and joining them without hyphens. A few examples:
+
+| Slash command | commands.yml key |
+|---|---|
+| `/help` | `Help` |
+| `/ban` | `Ban` |
+| `/ticket-manage` | `TicketManage` |
+| `/now-playing` | `Nowplaying` |
+| `/give-money` | `GiveMoney` |
+| `/shop-manage` | `ShopManage` |
+| `/role-prefixes` | `RolePrefixes` |
+| `/staff-history` | `StaffHistory` |
+| `/custom-commands` | `CustomCommands` |
+
+<Tip>
+  If a command key is missing from `commands.yml` entirely, the bot will log an error on startup for that command and skip loading it. Always add a new entry when installing addons or custom commands.
+</Tip>

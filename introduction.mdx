@@ -1,0 +1,93 @@
+---
+title: "Absolet: Self-Hosted Discord Bot for Communities"
+sidebarTitle: "Introduction"
+description: "Absolet is a self-hosted Discord bot with tickets, music, moderation, economy, levels, giveaways, and more — built with TypeScript and discord.js v14."
+---
+
+Absolet is a self-hosted, general-purpose Discord bot designed for community server owners who want full control over their bot's data, features, and behavior. Rather than inviting a third-party service, you run Absolet on your own infrastructure — giving you complete ownership of your configuration, your database, and every interaction your members have with it. Built on TypeScript and discord.js v14, it ships with a broad feature set out of the box while remaining straightforward to configure through two YAML files.
+
+## Features
+
+Absolet covers the most common needs of an active Discord community. Each feature area is independently configurable and can be enabled or disabled per-command in `config/commands.yml`.
+
+<CardGroup cols={2}>
+  <Card title="🎫 Tickets" icon="ticket" href="/features/tickets">
+    Create, manage, and transcript support tickets. Staff can claim, close, open, and add or remove members from ticket channels.
+  </Card>
+  <Card title="🔨 Moderation" icon="shield" href="/features/moderation">
+    Ban, kick, warn, and mute members. Manage announcements, snipe deleted messages, and keep a staff history log.
+  </Card>
+  <Card title="💰 Economy" icon="coins" href="/features/economy">
+    Full server economy with a wallet and bank, daily and weekly rewards, work cooldowns, rob mechanics, a shop, and admin money management.
+  </Card>
+  <Card title="⭐ Levels" icon="chart-line" href="/features/levels">
+    XP-based levelling system with a rank card generated via `@napi-rs/canvas`. Admins can give, set, or remove XP and levels directly.
+  </Card>
+  <Card title="🎵 Music" icon="music" href="/features/music">
+    Full-featured music player powered by DisTube with Spotify support. Play, skip, pause, resume, adjust volume, and more from voice channels.
+  </Card>
+  <Card title="🎉 Giveaways" icon="gift" href="/features/giveaways">
+    Create and manage giveaways with automatic winner selection powered by `discord-giveaways`.
+  </Card>
+  <Card title="✅ Verification" icon="user-check" href="/features/verification">
+    Gate access to your server with a configurable verification step before members can interact with the rest of your channels.
+  </Card>
+  <Card title="🏷️ Reaction Roles" icon="tag" href="/features/reaction-roles">
+    Let members self-assign roles by reacting to messages, keeping role management hands-off for your staff team.
+  </Card>
+</CardGroup>
+
+## Tech Stack
+
+Absolet is built with a modern, type-safe toolchain. The key libraries and their versions are pinned in `package.json`:
+
+| Library | Version | Purpose |
+|---|---|---|
+| `typescript` | 5.3.3 | Language and type safety |
+| `discord.js` | 14.11.0 | Discord API client |
+| `distube` | ^4.0.4 | Music playback engine |
+| `@distube/spotify` | ^1.5.1 | Spotify URL resolution for DisTube |
+| `mongoose` | ^7.4.2 | MongoDB object modelling |
+| `discord-giveaways` | ^6.0.1 | Giveaway lifecycle management |
+| `discord-backup` | ^3.3.2 | Server backup and restore |
+| `@napi-rs/canvas` | ^0.1.39 | Rank card and image generation |
+| `discord-html-transcripts` | ^3.1.3 | HTML ticket transcripts |
+| `js-yaml` | 4.1.0 | YAML config file parsing |
+| `glob` | 8.0.3 | File discovery for events, commands, and addons |
+| `ms` | ^2.1.3 | Human-readable duration parsing |
+
+The project is run with [Bun](https://bun.sh), which handles TypeScript execution directly without a separate compile step during development.
+
+## Architecture Overview
+
+Absolet's core is the `ExtendedClient` class, which extends discord.js's `Client` and adds all bot-specific collections and logic.
+
+```
+src/
+├── index.ts              # Entry point — instantiates ExtendedClient and calls start()
+├── structures/
+│   ├── Client.ts         # ExtendedClient: config loading, event/command/addon wiring
+│   └── Giveaway.ts       # Extended giveaway manager
+├── commands/             # Slash command files, discovered via glob
+├── events/               # Discord event handlers, discovered via glob
+├── addons/               # Optional addon modules (absolet-addons)
+├── models/               # Mongoose schemas (Guild, Poll, Roles, Starboard, …)
+├── helpers/              # Utilities: Logger, changeStatus, mongo, canvas assets
+└── typings/              # TypeScript interfaces for Config, Command, Event, …
+```
+
+On startup, `ExtendedClient.start()` runs through the following sequence:
+
+1. **Login** — connects to Discord using the token from `config/config.yml`.
+2. **Database** — establishes a Mongoose connection using the MongoDB URI.
+3. **Events** — dynamically loads every file under `src/events/**` via glob and registers them with `client.on()`.
+4. **Addons** — loads any addon modules found under `src/addons/**/index.ts`, registering their commands and events.
+5. **Commands** — loads all files under `src/commands/**`, filtering out any commands with `Enabled: false` in `config/commands.yml`.
+6. **Register** — syncs the loaded commands to Discord's application command API if the count has changed.
+7. **Activity** — begins cycling through the bot statuses defined in `ActivitySettings`.
+
+Config files (`config/config.yml`, `config/commands.yml`, `config/messages.yml`) are read synchronously at class instantiation time using `js-yaml`, making them available as typed objects throughout the bot's lifetime.
+
+<Note>
+  Absolet is designed for **single-guild deployments**. If the bot is invited to more than one server, it will operate using the first guild in its cache and log a warning. Multi-guild support is considered a beta feature and is not officially supported.
+</Note>

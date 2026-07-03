@@ -1,0 +1,95 @@
+---
+title: "Server Backup System: Create, Load, and Delete"
+sidebarTitle: "Backups"
+description: "Absolet can create snapshots of your Discord server's channels, roles, and emojis using the /backup command. Restore from any saved backup by ID."
+---
+
+Absolet includes a built-in server backup system that lets you snapshot your server's structure and restore it at any time. Backups capture the layout of your channels and categories, your roles, and your custom emojis — giving you a reliable safety net before large structural changes or migrations. The system is powered by the [`discord-backup`](https://www.npmjs.com/package/discord-backup) package (v3.3.2).
+
+<Warning>
+  Loading a backup **permanently deletes every channel** in your server before recreating the structure from the snapshot. This action cannot be undone. Always keep your backup ID stored somewhere safe, and make sure you are certain before confirming a load.
+</Warning>
+
+## What Gets Backed Up
+
+| Item | Backed Up? |
+|---|---|
+| Channel categories | ✅ Yes |
+| Text and announcement channels | ✅ Yes |
+| Roles | ✅ Yes |
+| Custom emojis | ✅ Yes |
+| Messages / message history | ❌ No |
+
+Message history is explicitly excluded from backups (`doNotBackup: ['messages']`). Only server structure and configuration are preserved.
+
+## Permissions
+
+All `/backup` subcommands are restricted to the **server owner** by default. This is configured in `config/commands.yml` and can be adjusted by editing the `Permissions` list for the `Backup` entry.
+
+## Commands
+
+<Steps>
+  <Step title="Create a backup">
+    ```
+    /backup create
+    ```
+
+    Takes a full snapshot of your server's channels (categories and others), roles, and emojis. When the backup is complete, Absolet replies with a confirmation embed containing the **backup ID**, the total channel count, and the emoji count.
+
+    **Save your backup ID.** It is the only way to reference this snapshot for loading or deletion later.
+  </Step>
+
+  <Step title="List all backups">
+    ```
+    /backup list
+    ```
+
+    Returns a paginated embed listing every backup on record. Each page shows:
+
+    - The backup's **ID**
+    - A **channel tree preview** — categories with their child channels indented beneath them
+    - The **creation timestamp** (displayed as a Discord relative timestamp)
+    - The **emoji count** included in the backup
+
+    Use the pagination buttons to move between backups if you have more than one.
+  </Step>
+
+  <Step title="Load a backup">
+    ```
+    /backup load <id>
+    ```
+
+    Restores the server structure from the specified backup. Before Absolet begins, it asks for confirmation with a prompt reading *"All channels will be deleted and replaced"*. You must click **Confirm** to proceed.
+
+    Once confirmed, all current channels are deleted and the saved channel structure, roles, and emojis are recreated from the backup data.
+
+    <Warning>
+      This action is irreversible. Clicking **Cancel** on the confirmation prompt safely aborts the operation with no changes made.
+    </Warning>
+  </Step>
+
+  <Step title="Delete a backup">
+    ```
+    /backup delete <id>
+    ```
+
+    Permanently removes the specified backup from storage. If no backup with that ID exists, Absolet replies with an ephemeral error message. Deleted backups cannot be recovered.
+  </Step>
+</Steps>
+
+## Quick Reference
+
+<CardGroup cols={2}>
+  <Card title="/backup create" icon="floppy-disk">
+    Snapshot channels, roles, and emojis. Returns a backup ID to store safely.
+  </Card>
+  <Card title="/backup list" icon="list">
+    Paginated overview of all saved backups with channel previews and timestamps.
+  </Card>
+  <Card title="/backup load &lt;id&gt;" icon="rotate-left">
+    **Destructive.** Deletes all channels and rebuilds from the chosen snapshot.
+  </Card>
+  <Card title="/backup delete &lt;id&gt;" icon="trash">
+    Permanently removes a backup by ID. Cannot be undone.
+  </Card>
+</CardGroup>

@@ -1,0 +1,190 @@
+---
+title: "Configure Absolet with the /setup Dashboard"
+sidebarTitle: "Setup Dashboard"
+description: "The /setup command opens an interactive in-Discord settings dashboard with categories for tickets, suggestions, welcome/goodbye, economy, verification, levels, filters, starboard, and sticky roles."
+---
+
+The `/setup` command is Absolet's primary configuration interface. Running it opens an interactive dashboard entirely inside Discord — no external web panel required. A selection menu lets you jump between eleven categories, and each category exposes per-setting buttons that walk you through channel pickers, role selectors, boolean toggles, and free-text prompts to capture exactly the value you need.
+
+<Note>
+  All changes saved through `/setup` take effect immediately. You do not need to restart the bot after updating any setting.
+</Note>
+
+## Navigating the Dashboard
+
+After running `/setup`, a selection menu labelled **"🔎 Select a category to configure"** appears. Choose a category from the menu to load its settings embed and action buttons. Use the same selection menu at any point to switch to a different category without re-running the command.
+
+---
+
+## Dashboard Categories
+
+### 🛠️ General Settings
+
+Top-level options that apply across the whole bot.
+
+| Setting | Type | Description |
+|---|---|---|
+| **Log Channel** | Channel | The channel where Absolet sends all audit and moderation logs. |
+| **Boost Channel** | Channel | The channel where server-boost celebration messages are posted. |
+
+---
+
+### 🎫 Ticket Settings
+
+Controls the behaviour of the ticket system, including limits, transcripts, and the review workflow.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Max tickets per user** | Number | `1` | How many open tickets a single user may have at the same time. |
+| **Transcript Channel** | Channel | — | The channel where ticket transcripts are sent when a ticket is closed. |
+| **Transcript On Close** | Boolean | `false` | When enabled, Absolet automatically saves a transcript every time a ticket channel is deleted. |
+| **Send transcript to user** | Boolean | `false` | When enabled, the transcript is sent to the ticket-creator's DMs instead of the transcript channel. |
+| **Message Type** | Choice | `Buttons` | Whether the ticket panel uses **Buttons** or **Menus** for category selection. |
+| **Toggle Review System** | Boolean | `true` | Enable or disable the post-ticket review (star-rating) prompt sent to users on close. |
+
+---
+
+### 🔔 Suggestions Settings
+
+Configures the community suggestion feature, including where suggestions appear and how staff decisions are surfaced.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Channel** | Channel | — | The channel where submitted suggestions are posted as embeds. |
+| **Upvote Emoji** | String | `👍` | The emoji shown on the upvote button of each suggestion embed. |
+| **Downvote Emoji** | String | `👎` | The emoji shown on the downvote button of each suggestion embed. |
+| **Disable buttons** | Boolean | `false` | When enabled, vote buttons are disabled after a staff member accepts or declines a suggestion. |
+
+---
+
+### 👋 Welcome Settings
+
+Defines what happens when a new member joins the server.
+
+| Setting | Type | Description |
+|---|---|---|
+| **Channel** | Channel | The channel where the welcome message is sent each time a member joins. |
+| **Message** | WebsiteEmbed | The embed to send. Build your embed at [embed.strider.top](https://embed.strider.top), copy the JSON output, and paste it into the chat when prompted. |
+| **Auto-Role** | Roles | One or more roles automatically granted to a member the moment they join. |
+
+**Welcome message placeholders**
+
+The following tokens are replaced with live data when the welcome message is sent:
+
+| Placeholder | Replaced with |
+|---|---|
+| `{user-tag}` | The joining user's full tag (e.g. `User#0001`) |
+| `{user-avatar}` | URL to the user's avatar |
+| `{user-id}` | The user's Discord ID |
+| `{user-name}` | The user's username |
+| `{guild-icon}` | URL to the server icon |
+| `{guild-name}` | The server's name |
+| `{memberCount}` | Current total member count |
+| `{createdTimestamp}` | Unix timestamp of when the user's account was created |
+| `{joinedTimestamp}` | Unix timestamp of when the user joined the server |
+| `{inviter-mention}` | Mention of the user who shared the invite |
+| `{inviter-tag}` | Full tag of the inviter |
+| `{inviter-name}` | Username of the inviter |
+| `{inviter-id}` | Discord ID of the inviter |
+| `{code}` | The invite code used to join |
+| `{card-url}` | URL to the auto-generated welcome banner image |
+| `{invites}` | Total number of invites the inviter has |
+
+---
+
+### ⛩️ Goodbye Settings
+
+Defines what happens when a member leaves or is removed from the server.
+
+| Setting | Type | Description |
+|---|---|---|
+| **Channel** | Channel | The channel where the goodbye message is sent each time a member leaves. |
+| **Message** | WebsiteEmbed | The embed to send. Build your embed at [embed.strider.top](https://embed.strider.top) and paste the JSON when prompted. |
+
+**Goodbye message placeholders**
+
+| Placeholder | Replaced with |
+|---|---|
+| `{user-tag}` | The departing user's full tag |
+| `{user-avatar}` | URL to the user's avatar |
+| `{user-id}` | The user's Discord ID |
+| `{user-name}` | The user's username |
+| `{guild-icon}` | URL to the server icon |
+| `{guild-name}` | The server's name |
+| `{memberCount}` | Member count after the user left |
+| `{joinedTimestamp}` | Unix timestamp of when the user originally joined |
+
+---
+
+### 🛡️ Verification Settings
+
+Controls the gate members must pass before accessing the full server.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Role** | Role | — | The role granted to a user after they complete verification. |
+| **Type** | Choice | `Captcha` | **Captcha** — the user must solve an image-based captcha. **Direct** — the user is verified instantly on button click. |
+
+---
+
+### ✨ Levels Settings
+
+Tunes the XP economy that powers the levelling system.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Max XP** | Number | `10` | The maximum XP a user can earn from a single message. |
+| **Min XP** | Number | `5` | The minimum XP a user can earn from a single message. |
+| **LevelUp Channel** | Channel | — | The channel where Absolet announces when a user reaches a new level. |
+
+---
+
+### 🕵️ Filters Settings
+
+Automatic content moderation rules applied to every message in the server.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Anti-Links** | Boolean | `false` | Delete any message containing a URL and warn the author. |
+| **Anti-Invites** | Boolean | `false` | Delete messages containing Discord invite links (`discord.gg/…`) and warn the author. |
+| **Anti-Ghost Ping** | Boolean | `false` | Detect when a user mentions someone and immediately deletes the message; the incident is logged to the log channel. |
+| **Bypass Roles** | Roles | `[]` | Roles exempt from all filter checks — members with these roles can post links and invites freely. |
+| **In Tickets** | Boolean | `false` | When enabled, filters are also enforced inside open ticket channels. |
+
+---
+
+### 💰 Economy Settings
+
+Customises the virtual currency and reward values across all economy commands.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Coin** | String | `🪙` | The emoji used as the server's currency symbol throughout all economy embeds. |
+| **Daily Reward** | Number | `1000` | Coins awarded when a user runs `/daily` (resets every 24 hours). |
+| **Weekly Reward** | Number | `2500` | Coins awarded when a user runs `/weekly` (resets every 7 days). |
+| **Max Money** | Number | `250` | The maximum coins a user can earn from a single `/work` use. |
+| **Min Money** | Number | `100` | The minimum coins a user can earn from a single `/work` use. |
+| **Blackjack Reward** | Number | `2` | Win multiplier applied to the bet when a user wins a game of `/blackjack`. |
+
+---
+
+### ⭐ Starboard Settings
+
+Highlights popular messages by reposting them to a dedicated channel once they collect enough star reactions.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Enabled** | Boolean | `false` | Master toggle for the entire starboard feature. |
+| **Channel** | Channel | — | The channel where starred messages are reposted. |
+| **Min Stars** | Number | `5` | Minimum number of ⭐ reactions a message must receive before it appears on the starboard. |
+
+---
+
+### 📌 Sticky Roles Settings
+
+Re-applies a member's previous roles automatically if they leave and rejoin the server.
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| **Enabled** | Boolean | `false` | Master toggle for sticky roles. When disabled, roles are never re-applied on rejoin. |
+| **Blacklisted Roles** | Roles | `[]` | Roles added here will **not** be re-applied when a member rejoins, even if they held them before leaving. |

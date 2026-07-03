@@ -1,20 +1,94 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "Absolet: Feature-Rich Self-Hosted Discord Bot"
+sidebarTitle: "Home"
+description: "Absolet is a self-hosted Discord bot with tickets, music, moderation, economy, levels, giveaways, verification, and more — all configurable via slash commands."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+Absolet is a fully-featured, self-hosted Discord bot built with TypeScript and discord.js v14. It brings together everything a modern Discord community needs — from a multi-panel ticket system with HTML transcripts to a full economy engine with a shop, leaderboards, and casino games — all configured interactively through an in-Discord settings dashboard.
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get Absolet running on your server in minutes
+  </Card>
+  <Card title="Configuration" icon="sliders" href="/configuration">
+    Set your token, database URI, and embed color
+  </Card>
+  <Card title="Core Features" icon="star" href="/features/tickets">
+    Explore tickets, music, economy, levels, and more
+  </Card>
+  <Card title="Command Reference" icon="terminal" href="/commands/admin">
+    Full reference for every slash command
+  </Card>
+</CardGroup>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+## What Absolet Includes
+
+Absolet ships with a broad set of production-ready features out of the box. No coding required — configure everything with `/setup` or dedicated admin commands.
+
+<CardGroup cols={3}>
+  <Card title="Ticket System" icon="ticket" href="/features/tickets">
+    Multi-panel tickets with questions, transcripts, reviews, and auto-close
+  </Card>
+  <Card title="Music" icon="music" href="/features/music">
+    YouTube & Spotify playback via DisTube with queue controls
+  </Card>
+  <Card title="Economy" icon="coins" href="/features/economy">
+    Cash & bank accounts, shop, daily rewards, blackjack, and leaderboards
+  </Card>
+  <Card title="Leveling" icon="chart-line" href="/features/levels">
+    XP-based levels with configurable gain rates and a level-up channel
+  </Card>
+  <Card title="Moderation" icon="shield" href="/features/moderation">
+    Ban, kick, warn, clear, nuke, announce — with a full case log
+  </Card>
+  <Card title="Giveaways" icon="gift" href="/features/giveaways">
+    Timed giveaways with role requirements and automatic winner selection
+  </Card>
+  <Card title="Verification" icon="shield-check" href="/features/verification">
+    CAPTCHA image or direct button verification with auto-role assignment
+  </Card>
+  <Card title="Reaction Roles" icon="hand-pointer" href="/features/reaction-roles">
+    Button or select-menu role panels, fully customizable per category
+  </Card>
+  <Card title="Addons" icon="puzzle-piece" href="/admin/addons">
+    Extend Absolet with community or custom addons dropped in a folder
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+<Steps>
+  <Step title="Clone the repository">
+    Grab the source code and install dependencies with Bun.
+    ```bash
+    git clone https://github.com/devjhoan/absolet.git
+    cd absolet
+    bun install
+    ```
+  </Step>
+  <Step title="Configure the bot">
+    Edit `config/config.yml` to add your bot token, MongoDB URI, and preferred embed color.
+    ```yaml config/config.yml
+    GeneralSettings:
+      Token: "YOUR_BOT_TOKEN"
+      LicenseKey: "YOUR_LICENSE_KEY"
+      EmbedColor: "#E74C3C"
+
+    DatabaseSettings:
+      Uri: "mongodb+srv://user:pass@cluster.mongodb.net/Absolet"
+    ```
+  </Step>
+  <Step title="Start the bot">
+    ```bash
+    bun run start
+    ```
+    Absolet registers all slash commands automatically on first boot.
+  </Step>
+  <Step title="Run /setup in Discord">
+    Use `/setup` to open the interactive settings dashboard and configure tickets, welcome messages, economy rewards, and more — all without touching config files.
+  </Step>
+</Steps>
+
+<Note>
+  Absolet requires **Node.js 18+** or **Bun** and a **MongoDB** instance. See the [Quickstart](/quickstart) for full prerequisites.
+</Note>

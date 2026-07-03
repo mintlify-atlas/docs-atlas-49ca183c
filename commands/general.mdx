@@ -1,0 +1,181 @@
+---
+title: "General Commands: Info, Stats, and Utilities"
+sidebarTitle: "General"
+description: "Reference for Absolet's general slash commands: afk, avatar, help, invites, leaderboard, messages, rank, serverinfo, serverip, suggest, userinfo, and weather."
+---
+
+General commands cover everyday utilities — profile lookups, server statistics, leaderboards, weather data, and the suggestion system. Most commands in this category are available to **@everyone**. The `/help` command is the primary discovery point for all bot commands.
+
+---
+
+## `/afk`
+
+Manages your AFK (Away From Keyboard) status. When AFK is enabled and another user mentions you, the bot will automatically reply with your AFK reason.
+
+**Default permission:** @everyone
+
+### Subcommands
+
+#### `enable`
+Sets your status as AFK with a reason.
+
+<ParamField path="reason" type="String" required>
+  The reason for going AFK (displayed when you are mentioned).
+</ParamField>
+
+#### `disable`
+Clears your AFK status, reason, and timestamp.
+
+#### `list`
+Displays all currently AFK users in the server with their reasons and time since going AFK. Results are paginated and ephemeral.
+
+---
+
+## `/avatar`
+
+Displays a user's avatar at full resolution (4096px) with download links for PNG, JPG, and GIF formats. The GIF button is disabled if the avatar is not animated.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user whose avatar to display. Defaults to yourself.
+</ParamField>
+
+---
+
+## `/help`
+
+Opens the interactive help menu. Displays all bot categories as buttons; clicking a category button lists its commands. The menu expires after 60 seconds of inactivity.
+
+**Default permission:** @everyone
+
+No parameters. The menu dynamically reads all loaded commands and organizes them by category (tickets, general, music, moderation, admin, fun, economy).
+
+---
+
+## `/invites`
+
+Shows invite statistics for a user: total invites, active joins, left members, fake invites, and bonus invites.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user to look up. Defaults to yourself.
+</ParamField>
+
+---
+
+## `/leaderboard`
+
+Displays ranked leaderboards for various server statistics. All results are paginated (10 entries per page).
+
+**Default permission:** @everyone
+
+### Subcommands
+
+#### `messages`
+Ranks members by total message count.
+
+#### `invites`
+Ranks members by total invite count (including bonus, minus fake and left).
+
+#### `levels`
+Ranks members by XP.
+
+#### `economy`
+Ranks members by total balance (wallet + bank combined).
+
+#### `voice-time`
+Ranks members by total time spent in voice channels (formatted using `ms` long format).
+
+---
+
+## `/messages`
+
+Displays the total number of messages sent by a user in the server.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user to check. Defaults to yourself.
+</ParamField>
+
+---
+
+## `/rank`
+
+Renders a rank card image showing a user's current level, XP, server rank position, and progress to the next level. Built using [Canvacord](https://canvacord.js.org/).
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user to generate the rank card for. Defaults to yourself.
+</ParamField>
+
+The card displays the user's avatar, username, discriminator, XP bar, current level, and server rank. The bot defers the reply while the image is generated.
+
+---
+
+## `/serverinfo`
+
+Displays detailed information about the current server: name, owner, creation date, member counts (online/total/bots), boost tier, booster count, role count, emoji count, channel count, and ticket review rating.
+
+**Default permission:** @everyone
+
+No parameters.
+
+---
+
+## `/serverip`
+
+Fetches live status information for a Minecraft server using the [mcsrvstat.us](https://api.mcsrvstat.us/) API.
+
+**Default permission:** @everyone
+
+<ParamField path="hostname" type="String" required>
+  The server's IP address, domain, or `host:port` string.
+</ParamField>
+
+Returns: IP, hostname, online player count, max players, and software version. If the server is offline, an offline embed is shown instead.
+
+---
+
+## `/suggest`
+
+Submits a suggestion to the server's suggestion channel. The suggestion is posted as an embed with upvote, downvote, and reset buttons. Staff can then respond using `/suggestion accept` or `/suggestion decline`.
+
+**Default permission:** @everyone
+
+<ParamField path="query" type="String" required>
+  Your suggestion text.
+</ParamField>
+
+<Note>
+  A suggestion channel must be configured via `/setup` (Suggestions Settings → Channel) before this command will work.
+</Note>
+
+---
+
+## `/userinfo`
+
+Displays detailed information about a server member: username, ID, account creation date, server join date, platform status (desktop/mobile/web), highest role, and all roles.
+
+**Default permission:** @everyone
+
+<ParamField path="user" type="User" required={false}>
+  The user to look up. Defaults to yourself.
+</ParamField>
+
+---
+
+## `/weather`
+
+Fetches real-time weather data for any city using the [WeatherAPI](https://www.weatherapi.com/).
+
+**Default permission:** @everyone
+
+<ParamField path="city" type="String" required>
+  The city name or location to look up.
+</ParamField>
+
+Returned data includes: temperature (°C and °F), feels-like temperature, humidity, wind speed/direction, visibility, and weather condition. The bot defers the reply while fetching.

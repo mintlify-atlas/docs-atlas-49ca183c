@@ -1,47 +1,170 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with Absolet in Minutes"
+sidebarTitle: "Quickstart"
+description: "Install Absolet, configure your bot token and MongoDB URI, and get your first slash commands registered on your Discord server in under 5 minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+Getting Absolet running is a straightforward process: clone the repository, fill in a handful of values in `config/config.yml`, and start the process. Slash commands register automatically on first boot, and a single `/setup` command walks you through enabling each feature inside your server.
 
 ## Prerequisites
 
-Before you begin, you must have:
+<Note>
+  Make sure the following are in place before you begin:
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+  - **Node.js 18+** or **[Bun](https://bun.sh)** (Bun is recommended — all run scripts use it directly)
+  - A **MongoDB instance** — either a local MongoDB server or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster
+  - A **Discord bot application** created in the [Discord Developer Portal](https://discord.com/developers/applications) with a bot token
+</Note>
 
-## Get started
+### Required Discord Gateway Intents
+
+Absolet requires the following Gateway Intents to be enabled on your bot application in the Developer Portal. Navigate to your application → **Bot** → **Privileged Gateway Intents** and enable all three privileged intents:
+
+- `MessageContent` *(privileged)*
+- `GuildMessages`
+- `GuildMessageReactions`
+- `GuildIntegrations`
+- `GuildMembers` *(privileged)*
+- `GuildWebhooks`
+- `Guilds`
+- `GuildModeration`
+- `GuildInvites`
+- `GuildPresences` *(privileged)*
+- `GuildScheduledEvents`
+- `GuildVoiceStates`
+
+<Warning>
+  Failing to enable the three **privileged** intents (`MessageContent`, `GuildMembers`, `GuildPresences`) will cause the bot to fail on startup with a missing intents error.
+</Warning>
+
+## Setup
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Clone the repository and install dependencies">
+    Clone the Absolet repository and install all dependencies using Bun:
 
     ```bash
-    npm install your-package
+    git clone https://github.com/devjhoan/absolet.git
+    cd absolet
+    bun install
     ```
+
+    Bun reads `package.json` and installs all runtime and dev dependencies, including discord.js, DisTube, Mongoose, and the canvas library.
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
-    ```bash
-    your-cli init
+  <Step title="Configure config/config.yml">
+    Open `config/config.yml` and replace the placeholder values with your own:
+
+    ```yaml title="config/config.yml"
+    GeneralSettings:
+      Token: "YOUR_BOT_TOKEN_HERE"
+      LicenseKey: "YOUR_LICENSE_KEY_HERE"
+      EmbedColor: "#E74C3C"
+
+    DatabaseSettings:
+      Uri: "mongodb+srv://<user>:<password>@<cluster>.mongodb.net/Absolet3"
+
+    ActivitySettings:
+      Enabled: true
+      Activities:
+        - ["Watching", "my community", "dnd"]
+        - ["Playing", "play.example.net", "dnd"]
+      Interval: "1m"
     ```
+
+    The required fields are:
+
+    | Field | Description |
+    |---|---|
+    | `GeneralSettings.Token` | Your Discord bot token from the Developer Portal |
+    | `GeneralSettings.LicenseKey` | Your Absolet license key |
+    | `GeneralSettings.EmbedColor` | Hex color used in all bot embeds (default `#E74C3C`) |
+    | `DatabaseSettings.Uri` | MongoDB connection string (local or Atlas) |
+
+    <Tip>
+      Your bot token is sensitive — never commit `config/config.yml` to a public repository. The file is already listed in `.gitignore` by default.
+    </Tip>
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+
+  <Step title="Optionally configure config/commands.yml">
+    `config/commands.yml` controls which commands are active and who can use them. Every command entry has at least two fields:
+
+    ```yaml title="config/commands.yml"
+    # Enable for everyone
+    Help:
+      Enabled: true
+      Permissions:
+        - "@everyone"
+
+    # Restrict to staff roles
+    Ban:
+      Enabled: true
+      Permissions:
+        - "Staff"
+        - "Owner"
+
+    # Disable a command entirely
+    Eval:
+      Enabled: false
+      Permissions:
+        - "Owner"
+    ```
+
+    Commands with `Enabled: false` are never loaded and will not appear in Discord's slash command menu. See the [Configuration reference](/configuration) for the full list of available commands and their default permissions.
+  </Step>
+
+  <Step title="Start the bot">
+    Start Absolet with Bun:
 
     ```bash
-    your-cli start
+    # Production — run once
+    bun run start
+
+    # Development — restart on file changes
+    bun run dev
     ```
+
+    On a successful start you will see log lines for the database connection, loaded events, loaded commands, and finally confirmation that slash commands have been registered with Discord.
+  </Step>
+
+  <Step title="Run /setup in your server">
+    Once the bot is online, use the `/setup` command inside your Discord server to configure individual features — tickets, levels, economy, verification, and more. Each module has its own setup flow that stores configuration in your MongoDB database.
+
+    <Tip>
+      The `/setup` command requires the **Staff** or **Owner** role by default (as configured in `commands.yml`). Make sure you have one of those roles before running it.
+    </Tip>
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Resetting Slash Commands
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+If you need to wipe all registered slash commands and re-register from scratch — for example after changing which commands are enabled — pass the `--reset-commands` flag:
+
+```bash
+bun run start -- --reset-commands
+```
+
+This clears all guild-level and global application commands, then exits. Start the bot normally afterwards to re-register the current set of enabled commands.
+
+## Bot Activity Configuration
+
+The cycling status messages shown on your bot's profile are driven by the `ActivitySettings` block in `config/config.yml`:
+
+```yaml title="config/config.yml"
+ActivitySettings:
+  Enabled: true          # Set to false to keep a static "Online" status
+  Activities:
+    - ["Watching", "strider.top", "dnd"]   # [type, text, status]
+    - ["Playing", "play.example.net", "dnd"]
+  Interval: "1m"         # How long each activity is shown before rotating
+```
+
+Each entry in `Activities` is a three-element array:
+
+| Index | Field | Accepted Values |
+|---|---|---|
+| 0 | Activity type | `Watching`, `Playing`, `Listening` |
+| 1 | Activity text | Any string |
+| 2 | Online status | `online`, `dnd`, `idle` |
+
+The bot rotates through the list on the cadence set by `Interval`, which accepts any duration string understood by the [`ms`](https://github.com/vercel/ms) library (e.g. `"30s"`, `"1m"`, `"2h"`).

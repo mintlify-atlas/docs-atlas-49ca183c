@@ -1,0 +1,104 @@
+---
+title: "XP Leveling System: Ranks and Leaderboards"
+sidebarTitle: "Levels"
+description: "Absolet awards XP on every message sent. Configure min/max XP per message, a level-up notification channel, and view rankings with /rank and /leaderboard."
+---
+
+Absolet's leveling system rewards members simply for being active. Every message a user sends in the server earns them a random amount of XP, and once they accumulate enough, they advance to the next level. The system is entirely automatic after a one-time configuration — no manual intervention is needed. Admins can also directly adjust any user's level or XP balance, and members can compare their progress through personal rank cards and a paginated server leaderboard.
+
+## How XP Works
+
+Every time a user sends a message, Absolet rolls a random integer between the configured **minimum** and **maximum** XP values and adds it to the user's `xp` field in `UserModel`. When the accumulated XP crosses the threshold for the next level, `level` increments and the bot sends a level-up notification to the configured channel.
+
+User progress is stored per-guild, so a member's level in one server is completely independent of their level in another.
+
+```typescript
+// Relevant fields from UserModel
+interface User {
+  guildId: string;
+  ownerId: string;  // Discord user ID
+  messages: number; // Total messages sent (tracked separately from XP)
+  xp: number;       // Current XP within the active level
+  level: number;    // Current level
+}
+```
+
+### Default XP Values
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `levelsConfig.min` | **5** | Minimum XP awarded per message |
+| `levelsConfig.max` | **10** | Maximum XP awarded per message |
+
+These are drawn from the `LevelsSchema` in `GuildModel`:
+
+```typescript
+const LevelsSchema = new Schema<LevelsConfig>({
+  max: { type: Number, default: 10 },
+  min: { type: Number, default: 5  },
+});
+```
+
+---
+
+## Commands
+
+<CardGroup cols={2}>
+  <Card title="/rank [user]" icon="id-card">
+    Displays a personalised rank card for the specified user (defaults to the command author). The card shows current level, XP progress, and server rank position.
+  </Card>
+  <Card title="/leaderboard levels" icon="ranking-star">
+    Shows a paginated leaderboard of all members in the server sorted by level and XP descending.
+  </Card>
+  <Card title="/leaderboard messages" icon="message">
+    Shows a paginated leaderboard sorted by total message count — separate from the XP leaderboard.
+  </Card>
+  <Card title="/messages [user]" icon="comments">
+    Displays the total number of messages a specific user has sent in the server.
+  </Card>
+</CardGroup>
+
+---
+
+## Level-Up Notifications
+
+When a user reaches a new level, Absolet sends a congratulatory embed to the **levelUp channel**. Configure this channel under `/setup → Levels Settings → LevelUp Channel`.
+
+If no channel is set, level-up notifications are silently skipped — XP and levels still accumulate normally.
+
+---
+
+## Configuration
+
+All leveling settings are found in `/setup → Levels Settings`:
+
+| Setting | `/setup` option | Default | Description |
+|---------|----------------|---------|-------------|
+| Min XP per message | **Min XP** | `5` | Lowest possible XP gain per message |
+| Max XP per message | **Max XP** | `10` | Highest possible XP gain per message |
+| Level-up channel | **LevelUp Channel** | _(none)_ | Channel where level-up announcements are sent |
+
+Changes take effect on the very next message sent in the server — no restart required.
+
+---
+
+## Admin Commands
+
+Administrators can manually adjust any member's progression without waiting for them to earn it organically.
+
+| Command | Description |
+|---------|-------------|
+| `/give-xp [user] [amount]` | Add XP to a user's current level progress |
+| `/set-xp [user] [amount]` | Set a user's XP to an exact value |
+| `/give-level [user] [amount]` | Add a number of levels to a user |
+| `/set-level [user] [amount]` | Set a user's level to an exact number |
+
+<Note>
+  Setting a user's level via `/set-level` overwrites the `level` field directly. The user's current XP within that level is not automatically reset — use `/set-xp` alongside it if you want to start them cleanly from `0` XP at the new level.
+</Note>
+
+---
+
+## Message Tracking
+
+XP and message counts are tracked independently. The `messages` field on `UserModel` increments on every qualifying message regardless of XP. This lets `/leaderboard messages` surface highly active members who may not yet have high levels, and gives moderators a separate signal for overall engagement.

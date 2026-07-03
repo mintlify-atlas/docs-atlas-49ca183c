@@ -1,0 +1,188 @@
+---
+title: "Moderation Commands: Ban, Kick, Warn, Clear, Nuke"
+sidebarTitle: "Moderation"
+description: "Reference for Absolet's moderation slash commands: ban (with unban/list), kick, warn (with remove/list), clear, nuke, and announce."
+---
+
+Absolet's moderation commands give staff teams precise control over member discipline and channel hygiene. All case-based commands (`/ban`, `/kick`, `/warn`) automatically track case numbers in the database, making audit history easy to review with the `list` subcommand. The `/clear`, `/nuke`, and `/announce` commands are scoped to **Admin** permission.
+
+---
+
+## `/ban`
+
+Ban manager for adding, removing, and viewing bans.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `add`
+Bans a member from the server and logs the case.
+
+<ParamField path="member" type="User" required>
+  The member to ban.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for the ban.
+</ParamField>
+
+<ParamField path="duration" type="Integer" required={false}>
+  Number of days of messages to delete (1–7).
+</ParamField>
+
+#### `remove`
+Unbans a member by case number or user ID and records the removal reason.
+
+<ParamField path="case" type="String" required>
+  The case number or Discord user ID to unban.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for removing the ban.
+</ParamField>
+
+#### `list`
+Lists all ban records, optionally filtered to a specific member.
+
+<ParamField path="member" type="User" required={false}>
+  Filter results to this member. Omit to list all bans.
+</ParamField>
+
+<Note>
+  The bot will refuse to ban a member whose highest role is equal to or higher than the moderator's highest role, or when the target is not bannable by the bot.
+</Note>
+
+---
+
+## `/kick`
+
+Kick manager for removing, tracking, and reviewing kicks.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `add`
+Kicks a member from the server and creates a case record.
+
+<ParamField path="member" type="User" required>
+  The member to kick.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for the kick.
+</ParamField>
+
+#### `remove`
+Marks a kick case as removed (does not re-add the member).
+
+<ParamField path="case" type="Integer" required>
+  The case number to remove.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for removing the kick record.
+</ParamField>
+
+#### `list`
+Displays all kick records, optionally filtered to one member.
+
+<ParamField path="member" type="User" required={false}>
+  Filter results to this member. Omit to list all kicks.
+</ParamField>
+
+---
+
+## `/warn`
+
+Warning manager for issuing, removing, and listing member warnings.
+
+**Default permission:** Staff, Owner
+
+### Subcommands
+
+#### `add`
+Issues a warning to a member and logs the case.
+
+<ParamField path="member" type="User" required>
+  The member to warn.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for the warning.
+</ParamField>
+
+#### `remove`
+Marks a warning case as removed.
+
+<ParamField path="case" type="Integer" required>
+  The case number to remove.
+</ParamField>
+
+<ParamField path="reason" type="String" required>
+  The reason for removing the warning.
+</ParamField>
+
+#### `list`
+Shows all warning records, optionally scoped to a single member.
+
+<ParamField path="member" type="User" required={false}>
+  Filter results to this member. Omit to list all warnings.
+</ParamField>
+
+<Note>
+  Warnings do not automatically trigger further punishment. Use `/ban` or `/kick` alongside warnings as needed.
+</Note>
+
+---
+
+## `/clear`
+
+Bulk-deletes a specified number of messages from the current channel.
+
+**Default permission:** Admin
+
+<ParamField path="amount" type="Number" required>
+  The number of messages to delete.
+</ParamField>
+
+<Warning>
+  Discord only allows bulk deletion of messages that are less than 14 days old. Attempting to delete older messages will result in an error.
+</Warning>
+
+---
+
+## `/nuke`
+
+Deletes all messages in a channel by cloning the channel and removing the original, preserving the channel's position. Requires confirmation before proceeding.
+
+**Default permission:** Admin
+
+<ParamField path="channel" type="Channel" required={false}>
+  The text channel to nuke. Defaults to the current channel.
+</ParamField>
+
+<Warning>
+  This action is irreversible. All message history in the target channel will be permanently lost. The bot presents a confirmation prompt before executing.
+</Warning>
+
+---
+
+## `/announce`
+
+Sends a custom message or embed to a channel using raw JSON code from an embed builder (e.g., [embed.strider.top](https://embed.strider.top/)).
+
+**Default permission:** Staff, Owner
+
+<ParamField path="code" type="String" required>
+  JSON-encoded message payload. May include an `embed` key which will be automatically converted to an `embeds` array.
+</ParamField>
+
+<ParamField path="channel" type="Channel" required={false}>
+  The target text or announcement channel. Defaults to the current channel.
+</ParamField>
+
+<Tip>
+  Build your embed at [embed.strider.top](https://embed.strider.top/) and paste the exported JSON directly into the `code` parameter. Hex color strings are automatically resolved.
+</Tip>

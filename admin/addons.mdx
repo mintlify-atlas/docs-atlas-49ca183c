@@ -1,0 +1,124 @@
+---
+title: "Extend Absolet with the Addon System"
+sidebarTitle: "Addons"
+description: "Absolet supports addons — self-contained packages that add new slash commands and event listeners. Drop an addon folder into src/addons/ and it loads automatically."
+---
+
+Absolet's addon system lets you extend the bot with extra slash commands and Discord event listeners without modifying any core source files. An addon is a self-contained folder that exports a structured object; the bot discovers and mounts it automatically on startup. This makes addons easy to share, version-control independently, and drop in or remove without touching built-in logic.
+
+<Tip>
+  Install the [`absolet-addons`](https://www.npmjs.com/package/absolet-addons) npm package (v1.0.3) in your project for full TypeScript type definitions when authoring addons. It is already listed as a dependency in `package.json`.
+</Tip>
+
+## How the Addon Loader Works
+
+During startup, `Client.ts` runs `loadAddons()`, which uses a glob pattern to find every `index.{js,ts}` file under `src/addons/**/`:
+
+```typescript src/structures/Client.ts
+async loadAddons() {
+  const addonFiles = await globPromise(
+    join(__dirname, '..', 'addons', '**/index{.js,.ts}')
+  );
+
+  for await (const filePath of addonFiles) {
+    const addon: Addon = await this.importFile(filePath);
+
+    for (const command of addon.commands as any[]) {
+      const permission = format(command.name);
+      const commandConfig = this.commandsConfig[permission];
+
+      if (!commandConfig)
+        this.logger.error(
+          `You need configure the permissions to the command "${command.name}"`
+        );
+      if (!commandConfig?.Enabled) continue;
+
+      this.commands.set(command.name, {
+        directory: 'general',
+        permission,
+        ...command,
+      });
+    }
+
+    for (const event of addon.events) {
+      this.on(event.event, event.run);
+    }
+
+    this.logger.info(`The ${addon.name} addon has been loadded`);
+  }
+}
+```
+
+Each addon's commands are registered alongside built-in commands and appear in `/help`. Each addon's events are wired directly to the Discord.js client, so they fire just like native event handlers.
+
+## Addon Structure
+
+An addon module must export a default object conforming to the `Addon` type from `absolet-addons`:
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `string` | A unique identifier for the addon, used in startup logs. |
+| `commands` | `Command[]` | An array of command objects, each with `name`, `description`, and a `run` handler. |
+| `events` | `Event[]` | An array of event objects, each with an `event` name and a `run` handler. Can be an empty array. |
+
+## Installing an Addon
+
+<Steps>
+  <Step title="Place the addon folder in src/addons/">
+    Create a directory at `src/addons/<your-addon-name>/` and add your `index.ts` (or `index.js`) entry file inside it. The loader picks up any `index` file one or more levels deep under `src/addons/`.
+  </Step>
+  <Step title="Register each command in config/commands.yml">
+    For every command name your addon exports, add a corresponding entry to `config/commands.yml`:
+
+    ```yaml config/commands.yml
+    Hello:
+      Enabled: true
+      Permissions:
+        - "ROLE_ID_HERE"
+    ```
+
+    The key must be the PascalCase version of the command name (e.g. `hello` → `Hello`, `my-command` → `MyCommand`). The `Permissions` array contains the Discord role IDs allowed to run the command.
+  </Step>
+  <Step title="Restart the bot">
+    Absolet only loads addons at startup. Run `bun run src/index.ts` (or your configured start script) to pick up the new addon.
+  </Step>
+</Steps>
+
+<Warning>
+  Every command exported by an addon **must** have a matching entry in `config/commands.yml`. If an entry is missing, Absolet logs an error — `You need configure the permissions to the command "<name>"` — and the command will not be registered or callable by users.
+</Warning>
+
+## Minimal Addon Example
+
+```typescript src/addons/my-addon/index.ts
+import type { Addon } from 'absolet-addons';
+
+const addon: Addon = {
+  name: 'my-addon',
+  commands: [
+    {
+      name: 'hello',
+      description: 'Say hello',
+      run: async ({ interaction }) => {
+        await interaction.reply('Hello!');
+      },
+    },
+  ],
+  events: [],
+};
+
+export default addon;
+```
+
+After placing this file and adding the following to `config/commands.yml`, the `/hello` command will appear in `/help` and be usable by members with the specified role:
+
+```yaml config/commands.yml
+Hello:
+  Enabled: true
+  Permissions:
+    - "YOUR_ROLE_ID"
+```
+
+## Addon Commands in /help
+
+Commands registered through addons are stored in the same `client.commands` collection as built-in commands, with `directory` set to `"general"`. They are included in Discord's slash command registry (`application.commands.set`) on the next startup after they are added, and they appear in `/help` alongside all other available commands.
