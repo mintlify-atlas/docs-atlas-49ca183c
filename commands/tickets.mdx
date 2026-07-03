@@ -4,7 +4,7 @@ sidebarTitle: "Tickets"
 description: "Reference for all ticket slash commands in Absolet: add, alert, claim, close, open, remove, and rename — used inside active ticket channels."
 ---
 
-All ticket commands must be run **inside an active ticket channel**. Absolet identifies whether a channel is a valid ticket by looking up its channel ID in the database. If the current channel is not a registered ticket, all commands in this category will reply with an error. Staff commands (`add`, `alert`, `claim`, `rename`) require the **Staff** or **Admin** permission level; `close` and `open` are available to all staff.
+All ticket commands must be run **inside an active ticket channel**. Absolet identifies whether a channel is a valid ticket by looking up its channel ID in the database. If the current channel is not a registered ticket, all commands in this category will reply with an error. Most ticket commands require the **Staff** or **Owner** permission level; `/rename` requires **Admin**.
 
 <Note>
   Ticket panels are created and configured with `/ticket-manage setup`. See the [Admin Commands](/commands/admin) reference for panel setup instructions.
@@ -14,7 +14,7 @@ All ticket commands must be run **inside an active ticket channel**. Absolet ide
 
 ## `/add`
 
-Adds a user to the current ticket channel, granting them view, send, and attach-files permissions.
+Add a user to a ticket — grants them view, send, and attach-files permissions on the current ticket channel.
 
 **Default permission:** Staff, Owner
 
@@ -28,7 +28,7 @@ The user's ID is also recorded in the `usersInTicket` list on the ticket documen
 
 ## `/alert`
 
-Sends a direct message to the ticket owner alerting them that their ticket requires attention. Useful when a user has gone inactive.
+Alert a user about their ticket — sends a direct message to the ticket owner alerting them that their ticket requires attention. Useful when a user has gone inactive.
 
 **Default permission:** Staff, Owner
 
@@ -38,7 +38,7 @@ No parameters. The ticket owner is determined from the stored `ownerId` on the t
 
 ## `/claim`
 
-Claims the current ticket for the responding staff member. Once claimed:
+Claim a ticket for the responding staff member. Once claimed:
 
 - The claiming staff member receives `ViewChannel` and `ManageChannels` permissions.
 - All other staff roles are hidden from the channel.
@@ -56,7 +56,7 @@ No parameters. A ticket cannot be claimed if it has already been claimed by anot
 
 ## `/close`
 
-Closes the current ticket. On close:
+Close the current ticket. On close:
 
 - All users in `usersInTicket` lose `ViewChannel` permission.
 - A control panel is posted with buttons for **Transcript**, **Reopen**, and **Delete**.
@@ -70,7 +70,7 @@ No parameters. Running `/close` on an already-closed ticket replies with an erro
 
 ## `/open`
 
-Reopens a previously closed ticket. On open:
+Open a previously closed ticket. On open:
 
 - All users in `usersInTicket` regain `ViewChannel` permission.
 - The close-control message is deleted.
@@ -84,7 +84,7 @@ No parameters. Running `/open` on an active (not closed) ticket replies with an 
 
 ## `/remove`
 
-Removes a user from the current ticket channel, revoking all their channel permission overwrites.
+Remove a user from the current ticket channel, revoking all their channel permission overwrites.
 
 **Default permission:** Staff, Owner
 
@@ -98,7 +98,7 @@ The user's ID is also removed from the `usersInTicket` list. If the user was nev
 
 ## `/rename`
 
-Renames the current ticket channel.
+Rename a ticket channel.
 
 **Default permission:** Admin
 

@@ -1,5 +1,5 @@
 ---
-title: "Economy System: Currency, Shop, and Casino Games"
+title: "Economy System: Currency, Shop, Blackjack, and Rewards"
 sidebarTitle: "Economy"
 description: "Absolet's economy system includes cash and bank accounts, a configurable shop, daily and weekly rewards, rob, pay, deposit/withdraw, and a blackjack game."
 ---
@@ -77,13 +77,13 @@ The `/shop` command lets members browse and purchase items that grant Discord ro
 
 Displays all shop items as paginated embeds (10 items per page). Each listing shows the item name, price, and description using the configured coin emoji.
 
-### Buying
+### Buying an Item
 
 ```
 /shop name:<item name>
 ```
 
-Providing the item name skips to the purchase flow. The bot checks:
+Pass the item's exact name to enter the purchase flow directly. The bot checks:
 
 1. The user has enough **cash** (not bank).
 2. The user does not already own the item's role.
@@ -162,9 +162,9 @@ Administrators have access to direct balance manipulation commands:
 
 | Command | Description |
 |---------|-------------|
-| `/give-money [user] [amount]` | Add coins to a user's cash balance |
+| `/givemoney [user] [amount]` | Add coins to a user's cash balance |
 | `/take-money [user] [amount]` | Remove coins from a user's cash balance |
-| `/set-money [user] [amount]` | Set a user's cash balance to an exact value |
+| `/setmoney [user] [amount]` | Set a user's cash balance to an exact value |
 | `/shop-manage` | Add or remove items from the server shop |
 
 <Tip>

@@ -1,10 +1,10 @@
 ---
 title: "Giveaway System with Role Requirements"
 sidebarTitle: "Giveaways"
-description: "Run timed giveaways in Absolet with optional role requirements. Users enter by reacting with 🎉; winners are selected automatically when the timer expires."
+description: "Run timed giveaways in Absolet with optional entry requirements. Members enter by reacting with 🎉 and winners are selected when the timer expires."
 ---
 
-Absolet includes a fully-featured giveaway system powered by `discord-giveaways`. Staff members can launch timed giveaways with custom prizes, winner counts, and optional entry requirements based on levels, invites, or message count. When the timer expires the bot selects winners automatically, announces them in the channel, and sends each winner a direct message.
+Absolet includes a fully-featured giveaway system powered by `discord-giveaways`. Staff members can launch timed giveaways with custom prizes, winner counts, and optional entry requirements based on levels, invites, or message count. When the timer expires the bot selects winners automatically and announces them in the channel.
 
 ## How Giveaways Work
 
@@ -12,7 +12,6 @@ Absolet includes a fully-featured giveaway system powered by `discord-giveaways`
 2. The bot posts a giveaway embed in the specified channel showing the prize, number of winners, host, and a countdown timestamp.
 3. Server members react with 🎉 to enter. The reaction is the entry mechanism — no slash commands are required from participants.
 4. When the end time is reached, the bot picks the configured number of winners at random, updates the embed to show the results, and replies in the channel with a winner announcement.
-5. Each winner receives a DM congratulating them and instructing them to open a support ticket to claim their prize.
 
 <Note>
   Bots are excluded from winning by default (`botsCanWin: false`).
@@ -45,7 +44,7 @@ Open the **Requirements** panel from within the creation wizard to gate entry be
 | Requirement | Button | Description |
 |---|---|---|
 | **Level** ✨ | `rq-levels` | Minimum XP level the user must have reached |
-| **Invites** 👥 | `rq-invites` | Minimum number of successful invites |
+| **Invites** 👥 | `rq-invites` | Minimum number of successful invites the user has brought in |
 | **Messages** 🌟 | `rq-messages` | Minimum total messages sent in the server |
 
 Enter `0` for any requirement to remove it. When requirements are set, the giveaway embed switches to the `GiveawayWithRequirements` template which lists each threshold so participants can see what they need. Users who react but do not meet the requirements are excluded from the winner draw automatically.
@@ -73,7 +72,7 @@ Selecting any of these actions opens a **select menu** listing all eligible give
 
 ## Winner Notifications
 
-When a giveaway ends, Absolet sends each winner a DM. The message content is taken from the `GiveawayWinMessage` string in `messages.yml`. By default this message instructs winners to **open a support ticket** to claim their prize, keeping the prize handoff process organised and auditable.
+When a giveaway ends, Absolet announces the winners in the channel. The winner message content is taken from the `GiveawayWinMessage` string in `messages.yml` and is fully customisable.
 
 If no valid participants entered (or all participants failed requirement checks), the bot posts the `GiveawayContentNoWinners` string in the channel instead.
 
@@ -92,7 +91,7 @@ Giveaway data is persisted in MongoDB via the `giveaways` collection. Key fields
   winnerCount: number;
   prize: string;
   hostedBy: string;        // Discord user ID of the host
-  botsCanWin: false;       // Always false — bots cannot enter
+  botsCanWin: boolean;     // Always false — bots cannot enter
   extraData: {
     description: string;
     image: string;

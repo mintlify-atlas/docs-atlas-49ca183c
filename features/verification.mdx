@@ -1,7 +1,7 @@
 ---
 title: "Member Verification: CAPTCHA and Direct Methods"
 sidebarTitle: "Verification"
-description: "Absolet protects your server with a verification gate. Choose between CAPTCHA image challenges or one-click direct verification, then assign a role on success."
+description: "Absolet gates new members behind verification. Choose between CAPTCHA image challenges or one-click direct verification, then assign a role on success."
 ---
 
 Absolet's verification system lets you place a gate between new members and the rest of your server. Until a user completes the verification step they won't receive the member role, keeping bots and low-effort raiders from accessing your channels. You can choose between a CAPTCHA challenge that requires reading a generated image, or a one-click direct method for communities that prefer a lighter touch.
@@ -10,7 +10,7 @@ Absolet's verification system lets you place a gate between new members and the 
 
 ### Captcha
 
-The CAPTCHA method generates a unique **450 × 150 px PNG image** using `@napi-rs/canvas` with a random 7-character uppercase word rendered in the custom `deToks` font on a white background. The user is shown the image alongside **five buttons**, each labelled with a different 7-character word string. Only one button matches the word in the image.
+The CAPTCHA method generates a unique **450 × 150 px PNG image** using `@napi-rs/canvas` with a random 7-character uppercase word rendered in the custom `deToks` font at 70 px. The text is drawn centred on a transparent canvas. The user is shown the image alongside **five buttons**, each labelled with a different 7-character word string. Only one button matches the word in the image.
 
 - ✅ **Correct answer** — the bot grants the configured role and replies with the `UserVerifiedEmbed`.
 - ❌ **Wrong answer** — the bot replies with the `VerificationIncorrectEmbed`. All buttons are disabled and colour-coded (the correct answer turns green, all wrong answers turn red) so the user can see what they missed before retrying.
@@ -63,7 +63,7 @@ Buttons:
   Verification:
     Label: "Verify"
     Emoji: "✅"
-    Style: "Success"
+    Style: "Secondary"
 ```
 
 <Note>

@@ -1,5 +1,5 @@
 ---
-title: "XP Leveling System: Ranks and Leaderboards"
+title: "XP Leveling System: Ranks, Leaderboards, and Admin Controls"
 sidebarTitle: "Levels"
 description: "Absolet awards XP on every message sent. Configure min/max XP per message, a level-up notification channel, and view rankings with /rank and /leaderboard."
 ---
@@ -88,13 +88,13 @@ Administrators can manually adjust any member's progression without waiting for 
 
 | Command | Description |
 |---------|-------------|
-| `/give-xp [user] [amount]` | Add XP to a user's current level progress |
-| `/set-xp [user] [amount]` | Set a user's XP to an exact value |
-| `/give-level [user] [amount]` | Add a number of levels to a user |
-| `/set-level [user] [amount]` | Set a user's level to an exact number |
+| `/givexp [user] [amount]` | Add XP to a user's current level progress |
+| `/setxp [user] [amount]` | Set a user's XP to an exact value |
+| `/givelevel [user] [amount]` | Add a number of levels to a user |
+| `/setlevel [user] [level]` | Set a user's level to an exact number |
 
 <Note>
-  Setting a user's level via `/set-level` overwrites the `level` field directly. The user's current XP within that level is not automatically reset — use `/set-xp` alongside it if you want to start them cleanly from `0` XP at the new level.
+  Setting a user's level via `/setlevel` overwrites the `level` field directly. The user's current XP within that level is not automatically reset — use `/setxp` alongside it if you want to start them cleanly from `0` XP at the new level.
 </Note>
 
 ---

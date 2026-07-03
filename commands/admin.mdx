@@ -10,7 +10,7 @@ The admin category contains Absolet's most powerful management commands. Most of
 
 ## `/setup`
 
-Opens an interactive dashboard for configuring the bot across all major feature areas, including general settings, ticket configuration, welcome/goodbye messages, verification, levels, filters, economy, starboard, and sticky roles. All settings are saved to the database in real-time using button-driven prompts.
+Configure your discord server via an interactive button-driven dashboard. All major feature areas are available, including general settings, ticket configuration, welcome/goodbye messages, verification, levels, filters, economy, starboard, and sticky roles. All settings are saved to the database in real-time.
 
 **Default permission:** Staff, Owner
 
@@ -22,7 +22,7 @@ Opens an interactive dashboard for configuring the bot across all major feature 
 
 ## `/backup`
 
-Manages server backup snapshots (channels, categories, emojis).
+Manage the backup system for server snapshots (channels, categories, emojis).
 
 **Default permission:** Owner
 
@@ -56,7 +56,7 @@ Permanently removes a backup by ID.
 
 ## `/ticket-manage`
 
-Creates and manages ticket panel configurations for the server.
+Manage ticket panels — creates and configures ticket panel setups for the server.
 
 **Default permission:** Staff, Owner
 
@@ -89,7 +89,7 @@ Opens an interactive editor for an existing panel's name, emoji, category, style
 
 ## `/giveaway`
 
-Full-featured giveaway lifecycle management via an interactive button menu.
+Manage giveaways via an interactive button menu.
 
 **Default permission:** Staff, Owner
 
@@ -113,7 +113,7 @@ Requirements (levels, invites, messages) can optionally be set during creation.
 
 ## `/reaction-roles`
 
-Manages button-based reaction role panels.
+Manage the reaction-roles system using button-based role panels.
 
 **Default permission:** Staff, Owner
 
@@ -179,7 +179,7 @@ Removes a reaction role entry by role.
 
 ## `/verify`
 
-Posts the verification embed (with a verify button) to a channel. The verification role must be configured via `/setup` first.
+Send the verification embed (with a verify button) to a channel. The verification role must be configured via `/setup` first.
 
 **Default permission:** Staff, Owner
 
@@ -191,7 +191,7 @@ Posts the verification embed (with a verify button) to a channel. The verificati
 
 ## `/suggestion`
 
-Staff tool for accepting or declining user suggestions submitted via `/suggest`.
+Suggestion Manager — staff tool for accepting or declining user suggestions submitted via `/suggest`.
 
 **Default permission:** Staff, Owner
 
@@ -223,7 +223,7 @@ Marks a suggestion as Declined.
 
 ## `/custom-commands`
 
-Creates, deletes, and lists server-specific custom slash commands that reply with a configured embed.
+Make custom commands for your server — creates, deletes, and lists server-specific custom slash commands that reply with a configured embed.
 
 **Default permission:** Owner
 
@@ -245,7 +245,7 @@ Displays all custom commands and their permission roles with pagination.
 
 ## `/role`
 
-Manages temporary timed roles assigned to members.
+Manage the rank system — manages temporary timed roles assigned to members.
 
 **Default permission:** Owner
 
@@ -288,7 +288,7 @@ Lists all active temporary role assignments.
 
 ## `/role-prefixes`
 
-Attaches text prefixes to roles, displayed in the rank card and other places.
+Manage the role prefixes — attaches text prefixes to roles, displayed in the rank card and other places.
 
 **Default permission:** Admin
 
@@ -317,7 +317,7 @@ Displays all role prefixes with pagination.
 
 ## `/shop-manage`
 
-Manages items in the economy shop.
+Manage the shop items in the economy system.
 
 **Default permission:** Admin
 
@@ -347,7 +347,7 @@ Adds a new purchasable item.
 </ParamField>
 
 <ParamField path="stock" type="Integer" required={false}>
-  Maximum number of purchases. `null` = unlimited; `0` = out of stock.
+  Maximum number of purchases (minimum 0). Omit for unlimited stock.
 </ParamField>
 
 #### `remove`
@@ -360,7 +360,7 @@ Displays all shop items with pagination.
 
 ## `/blacklist`
 
-Temporarily prevents a user from using bot commands.
+Blacklist a user from using commands temporarily.
 
 **Default permission:** Admin
 
@@ -380,7 +380,7 @@ Temporarily prevents a user from using bot commands.
 
 ## `/faq`
 
-Creates and publishes interactive FAQ pages with buttons.
+Create a faq page for your server with interactive button-driven FAQ pages.
 
 **Default permission:** Admin
 
@@ -400,7 +400,7 @@ Posts a previously created FAQ page to the current channel.
 
 ## `/poll`
 
-Sends a poll message to a channel with emoji reactions for each choice.
+Send a poll message to a channel with emoji reactions for each choice.
 
 **Default permission:** Admin
 
@@ -425,7 +425,7 @@ Sends a poll message to a channel with emoji reactions for each choice.
 </ParamField>
 
 <ParamField path="choice3 – choice10" type="String" required={false}>
-  Up to eight additional choice options.
+  Up to eight additional choice options (`choice3` through `choice10`).
 </ParamField>
 
 <ParamField path="channel" type="Channel" required={false}>
@@ -436,7 +436,7 @@ Sends a poll message to a channel with emoji reactions for each choice.
 
 ## `/snipe`
 
-Retrieves recently deleted messages from a channel.
+Get the messages deleted in a specific channel.
 
 **Default permission:** Admin
 
@@ -448,7 +448,7 @@ Retrieves recently deleted messages from a channel.
 
 ## `/say`
 
-Sends a plain text message in the current channel as the bot.
+Send a message using the bot in the current channel.
 
 **Default permission:** Admin
 
@@ -460,7 +460,7 @@ Sends a plain text message in the current channel as the bot.
 
 ## `/addemoji`
 
-Copies an emoji from another server and adds it to the current server.
+Adds an emoji to the server from another server or a custom emoji string.
 
 **Default permission:** Admin
 
@@ -476,7 +476,7 @@ Copies an emoji from another server and adds it to the current server.
 
 ## `/givelevel`
 
-Adds levels to a user's profile.
+Give a user a level — adds levels to a user's profile.
 
 **Default permission:** Admin
 
@@ -492,7 +492,7 @@ Adds levels to a user's profile.
 
 ## `/givexp`
 
-Adds XP to a user's profile.
+Give XP to a user — adds XP to a user's profile.
 
 **Default permission:** Admin
 
@@ -508,7 +508,7 @@ Adds XP to a user's profile.
 
 ## `/setlevel`
 
-Overrides a user's current level.
+Set a user's level — overrides a user's current level.
 
 **Default permission:** Admin
 
@@ -524,7 +524,7 @@ Overrides a user's current level.
 
 ## `/setxp`
 
-Overrides a user's current XP value.
+Set the XP of a user — overrides a user's current XP value.
 
 **Default permission:** Admin
 
@@ -540,7 +540,7 @@ Overrides a user's current XP value.
 
 ## `/givemoney`
 
-Adds money to a user's wallet or bank account.
+Give money to someone — adds money to a user's wallet or bank account.
 
 **Default permission:** Admin
 
@@ -560,7 +560,7 @@ Adds money to a user's wallet or bank account.
 
 ## `/setmoney`
 
-Sets a user's wallet or bank balance to an exact amount.
+Set the money of a user — sets a user's wallet or bank balance to an exact amount.
 
 **Default permission:** Admin
 
@@ -580,7 +580,7 @@ Sets a user's wallet or bank balance to an exact amount.
 
 ## `/take-money`
 
-Deducts money from a user's wallet or bank account.
+Take money from a user's wallet or bank account.
 
 **Default permission:** Admin
 
@@ -600,7 +600,7 @@ Deducts money from a user's wallet or bank account.
 
 ## `/manage`
 
-Advanced server management covering temporary voice channels and statistics counter channels.
+Manage the discord bot configurations — covers temporary voice channels and statistics counter channels.
 
 **Default permission:** Admin
 
@@ -648,3 +648,27 @@ Removes a counter channel from the database.
 
 #### `stats check`
 Scans for and removes stale counter channels that no longer exist in the server.
+
+---
+
+## `/eval`
+
+Execute a code using the discord bot. Prompts for a code block via chat message, then evaluates it and displays the input, output, and type.
+
+**Default permission:** Owner
+
+No parameters. After the command is used, the bot listens for a follow-up message containing the code to evaluate.
+
+<Warning>
+  This command executes arbitrary code in the bot's Node.js process. It is strictly Owner-only and should never be granted to untrusted users.
+</Warning>
+
+---
+
+## `/reload`
+
+Reload the bot configuration files (`config/commands.yml` and `config/messages.yml`) without restarting the bot process.
+
+**Default permission:** Admin
+
+No parameters.

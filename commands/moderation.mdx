@@ -1,16 +1,16 @@
 ---
 title: "Moderation Commands: Ban, Kick, Warn, Clear, Nuke"
 sidebarTitle: "Moderation"
-description: "Reference for Absolet's moderation slash commands: ban (with unban/list), kick, warn (with remove/list), clear, nuke, and announce."
+description: "Reference for Absolet's moderation slash commands: ban (with add/remove/list), kick, warn (with add/remove/list), clear, nuke, and announce."
 ---
 
-Absolet's moderation commands give staff teams precise control over member discipline and channel hygiene. All case-based commands (`/ban`, `/kick`, `/warn`) automatically track case numbers in the database, making audit history easy to review with the `list` subcommand. The `/clear`, `/nuke`, and `/announce` commands are scoped to **Admin** permission.
+Absolet's moderation commands give staff teams precise control over member discipline and channel hygiene. All case-based commands (`/ban`, `/kick`, `/warn`) automatically track case numbers in the database, making audit history easy to review with the `list` subcommand. The `/clear`, `/nuke`, and `/announce` commands each have their own permission levels as configured in `config/commands.yml`.
 
 ---
 
 ## `/ban`
 
-Ban manager for adding, removing, and viewing bans.
+Ban's manager for adding, removing, and viewing bans.
 
 **Default permission:** Staff, Owner
 
@@ -57,7 +57,7 @@ Lists all ban records, optionally filtered to a specific member.
 
 ## `/kick`
 
-Kick manager for removing, tracking, and reviewing kicks.
+Kicks manager for removing, tracking, and reviewing kicks.
 
 **Default permission:** Staff, Owner
 
@@ -96,7 +96,7 @@ Displays all kick records, optionally filtered to one member.
 
 ## `/warn`
 
-Warning manager for issuing, removing, and listing member warnings.
+Warn's manager for issuing, removing, and listing member warnings.
 
 **Default permission:** Staff, Owner
 
@@ -139,7 +139,7 @@ Shows all warning records, optionally scoped to a single member.
 
 ## `/clear`
 
-Bulk-deletes a specified number of messages from the current channel.
+Delete a number of messages from the channel.
 
 **Default permission:** Admin
 
@@ -155,7 +155,7 @@ Bulk-deletes a specified number of messages from the current channel.
 
 ## `/nuke`
 
-Deletes all messages in a channel by cloning the channel and removing the original, preserving the channel's position. Requires confirmation before proceeding.
+Delete all the messages in a channel by cloning the channel and removing the original, preserving the channel's position. Requires confirmation before proceeding.
 
 **Default permission:** Admin
 
@@ -171,7 +171,7 @@ Deletes all messages in a channel by cloning the channel and removing the origin
 
 ## `/announce`
 
-Sends a custom message or embed to a channel using raw JSON code from an embed builder (e.g., [embed.strider.top](https://embed.strider.top/)).
+Send a message/embed to a channel using raw JSON code from an embed builder (e.g., [embed.strider.top](https://embed.strider.top/)).
 
 **Default permission:** Staff, Owner
 

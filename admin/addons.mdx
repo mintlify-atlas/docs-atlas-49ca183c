@@ -1,7 +1,7 @@
 ---
-title: "Extend Absolet with the Addon System"
+title: "Extend Absolet with Custom Addons: Commands and Events"
 sidebarTitle: "Addons"
-description: "Absolet supports addons — self-contained packages that add new slash commands and event listeners. Drop an addon folder into src/addons/ and it loads automatically."
+description: "Absolet addons extend the bot with commands and events without touching core files. Place an addon folder in src/addons/ and it loads on startup."
 ---
 
 Absolet's addon system lets you extend the bot with extra slash commands and Discord event listeners without modifying any core source files. An addon is a self-contained folder that exports a structured object; the bot discovers and mounts it automatically on startup. This makes addons easy to share, version-control independently, and drop in or remove without touching built-in logic.

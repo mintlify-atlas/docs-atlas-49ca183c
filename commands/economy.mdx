@@ -4,7 +4,7 @@ sidebarTitle: "Economy"
 description: "Reference for Absolet's economy slash commands: balance, work, daily, weekly, rob, pay, deposit, withdraw, shop, and blackjack."
 ---
 
-Absolet's economy system revolves around two balances per user: a **wallet** (cash on hand) and a **bank** (secured savings). The currency symbol, reward amounts, and cooldowns are all configured server-side via `/setup`. Every command in this category is available to **@everyone** by default, with the exception of game commands that require a bet.
+Absolet's economy system revolves around two balances per user: a **wallet** (cash on hand) and a **bank** (secured savings). The currency symbol, reward amounts, and cooldowns are all configured server-side via `/setup`. Every command in this category is available to **@everyone** by default.
 
 <Tip>
   Configure the coin emoji, daily/weekly reward amounts, and min/max work earnings in `/setup` under **Economy Settings**.
@@ -14,7 +14,7 @@ Absolet's economy system revolves around two balances per user: a **wallet** (ca
 
 ## `/balance`
 
-Displays a user's current wallet balance, bank balance, and total net worth.
+Check the balance of a user — displays their current wallet balance, bank balance, and total net worth.
 
 **Default permission:** @everyone
 
@@ -26,7 +26,7 @@ Displays a user's current wallet balance, bank balance, and total net worth.
 
 ## `/work`
 
-Earns a random amount of money added to your **wallet**. The amount is between the server-configured `minMoney` and `maxMoney` values.
+Work for money — earns a random amount of money added to your **wallet**. The amount is between the server-configured `minMoney` and `maxMoney` values.
 
 **Default permission:** @everyone (cooldown: 1 hour)
 
@@ -60,7 +60,7 @@ No parameters.
 
 ## `/rob`
 
-Attempts to steal cash from another user's **wallet**. There is a 50% chance of success. On success, between 50% and 100% of the victim's wallet is stolen. On failure, the same random amount is deducted from your own wallet as a penalty.
+Attemp to rob another user's cash from their **wallet**. There is a 50% chance of success. On success, between 50% and 100% of the victim's wallet is stolen. On failure, the same random amount is deducted from your own wallet as a penalty.
 
 **Default permission:** @everyone (cooldown: 12 hours)
 
@@ -76,7 +76,7 @@ Attempts to steal cash from another user's **wallet**. There is a 50% chance of 
 
 ## `/pay`
 
-Transfers money from your **wallet** to another user's **bank**.
+Give another member your money — transfers money from your **wallet** to another user's account.
 
 **Default permission:** @everyone
 
@@ -92,7 +92,7 @@ Transfers money from your **wallet** to another user's **bank**.
 
 ## `/deposit`
 
-Moves money from your **wallet** into your **bank**.
+Deposit money into your bank account — moves money from your **wallet** into your **bank**.
 
 **Default permission:** @everyone
 
@@ -104,7 +104,7 @@ Moves money from your **wallet** into your **bank**.
 
 ## `/withdraw`
 
-Moves money from your **bank** into your **wallet**.
+Withdraw money from your account — moves money from your **bank** into your **wallet**.
 
 **Default permission:** @everyone
 
@@ -116,7 +116,7 @@ Moves money from your **bank** into your **wallet**.
 
 ## `/shop`
 
-Browses the server shop or purchases an item by name. Items grant a configured role upon purchase and deduct the item price from your **wallet**.
+Buy items from the shop with your balance — browse the server shop or purchase an item by name. Items grant a configured role upon purchase and deduct the item price from your **wallet**.
 
 **Default permission:** @everyone
 

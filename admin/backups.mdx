@@ -1,5 +1,5 @@
 ---
-title: "Server Backup System: Create, Load, and Delete"
+title: "Server Backup System: Create, Load, List, and Delete"
 sidebarTitle: "Backups"
 description: "Absolet can create snapshots of your Discord server's channels, roles, and emojis using the /backup command. Restore from any saved backup by ID."
 ---
@@ -24,13 +24,13 @@ Message history is explicitly excluded from backups (`doNotBackup: ['messages']`
 
 ## Permissions
 
-All `/backup` subcommands are restricted to the **server owner** by default. This is configured in `config/commands.yml` and can be adjusted by editing the `Permissions` list for the `Backup` entry.
+All `/backup` subcommands are restricted to members with the **Owner** role by default. This is configured in `config/commands.yml` under the `Backup` key and can be adjusted by editing the `Permissions` list for that entry.
 
 ## Commands
 
 <Steps>
   <Step title="Create a backup">
-    ```
+    ```bash
     /backup create
     ```
 
@@ -40,7 +40,7 @@ All `/backup` subcommands are restricted to the **server owner** by default. Thi
   </Step>
 
   <Step title="List all backups">
-    ```
+    ```bash
     /backup list
     ```
 
@@ -55,7 +55,7 @@ All `/backup` subcommands are restricted to the **server owner** by default. Thi
   </Step>
 
   <Step title="Load a backup">
-    ```
+    ```bash
     /backup load <id>
     ```
 
@@ -69,7 +69,7 @@ All `/backup` subcommands are restricted to the **server owner** by default. Thi
   </Step>
 
   <Step title="Delete a backup">
-    ```
+    ```bash
     /backup delete <id>
     ```
 

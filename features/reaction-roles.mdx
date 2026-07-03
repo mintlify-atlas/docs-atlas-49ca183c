@@ -1,16 +1,16 @@
 ---
-title: "Reaction Roles: Button and Select Menu Panels"
+title: "Reaction Roles: Self-Assign Roles via Buttons"
 sidebarTitle: "Reaction Roles"
-description: "Absolet's reaction role system lets you create button or select-menu panels that assign Discord roles when members click. Configure panels with /reaction-roles."
+description: "Absolet's reaction role system lets members self-assign Discord roles by clicking buttons on a panel embed. Configure and post panels with /reaction-roles."
 ---
 
 Reaction roles let your server members self-assign Discord roles by clicking a button on a panel embed. Each button is tied to a specific role, labelled with a custom emoji and text, and styled with one of Discord's four button colours. Panels are organised by category so you can have separate panels for notification preferences, regional roles, game interests, and more — all managed through a single `/reaction-roles` command.
 
 ## Display Modes
 
-Absolet currently renders reaction role panels as **button rows**. Each role in a category becomes one button, and up to five buttons can be placed per row (Discord's limit). When a category has more than five roles the bot automatically wraps to a new action row.
+Absolet renders reaction role panels as **button rows**. Each role in a category becomes one button, and up to five buttons can be placed per row (Discord's limit). When a category has more than five roles the bot automatically wraps to a new action row.
 
-An optional `display-label` flag on the send subcommand controls whether the button shows the role's text label alongside its emoji, or just the emoji alone — useful for compact panels.
+An optional `display-label` flag on the `send` subcommand controls whether each button shows the role's text label alongside its emoji, or just the emoji alone — useful for compact panels.
 
 ## Setup
 
@@ -56,7 +56,7 @@ An optional `display-label` flag on the send subcommand controls whether the but
       display-label:true
     ```
 
-    The bot filters `rolesConfig` to only include entries matching the given `category`, builds the button rows, and posts the embed. The embed body is built from the `SelectReactionRoleEmbed` template in `messages.yml` with the `{panels}` placeholder replaced by a formatted list of all roles in the category.
+    The bot filters `rolesConfig` to only include entries matching the given `category`, builds the button rows, and posts the embed. The embed body is built from the `SelectReactionRoleEmbed` template in `messages.yml` with the `{panels}` placeholder replaced by a formatted list of all roles in the category. The `channel` and `display-label` options are both optional; if `channel` is omitted the panel is posted in the current channel.
   </Step>
   <Step title="Members interact with the panel">
     Once posted, any server member can click a button. The interaction is handled instantly — no slash command required from the member's side.

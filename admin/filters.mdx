@@ -1,7 +1,7 @@
 ---
 title: "Content Filters: Anti-Links, Anti-Invites, Ghost Ping"
 sidebarTitle: "Filters"
-description: "Absolet can automatically delete messages containing links or Discord invites and detect ghost pings. Configure bypass roles and per-location exceptions via /setup."
+description: "Absolet auto-deletes messages with links or Discord invites and detects ghost pings. Configure bypass roles and ticket exceptions via /setup."
 ---
 
 Absolet ships three automatic content filters that work silently in the background, deleting offending messages and notifying authors or moderators without any manual intervention. Each filter is toggled independently, so you can enable only the protections your server needs. All filter configuration lives inside `/setup` → **Filters Settings**.
@@ -70,7 +70,7 @@ A ghost ping happens when a user mentions another user (or a role) and then imme
 
 In addition to automated message filters, you can also temporarily ban a specific user from using **any** Absolet command using `/blacklist`:
 
-```
+```bash
 /blacklist <user> <duration> <reason>
 ```
 

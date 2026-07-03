@@ -14,7 +14,7 @@ Absolet's music system is powered by [DisTube](https://distube.js.org/). All pla
 
 ## `/play`
 
-Adds a song to the queue and begins playback. Accepts a song name or URL (YouTube, SoundCloud, Spotify, etc. — depending on your DisTube plugins).
+Add a song to the queue and plays it. Accepts a song name or URL (YouTube, SoundCloud, Spotify, etc. — depending on your DisTube plugins).
 
 **Default permission:** @everyone
 
@@ -28,7 +28,7 @@ The bot defers the reply while searching and starts playback in your current voi
 
 ## `/skip`
 
-Skips the currently playing song and advances to the next track in the queue.
+Skip the current song and advance to the next track in the queue.
 
 **Default permission:** @everyone
 
@@ -38,7 +38,7 @@ No parameters. Returns an error if the queue is empty.
 
 ## `/stop`
 
-Stops playback and clears the entire song queue.
+Stops the current song and clears the entire song queue.
 
 **Default permission:** @everyone
 
@@ -100,12 +100,12 @@ The progress bar uses a 30-character line with a 🔘 marker at the current posi
 
 ## `/volume`
 
-Sets the playback volume for the current queue.
+Change the volume of the current song.
 
 **Default permission:** @everyone
 
 <ParamField path="volume" type="Integer" required>
-  The volume level to set. Valid values depend on DisTube's internal range (typically 0–100+).
+  The volume level to set.
 </ParamField>
 
 <Note>
